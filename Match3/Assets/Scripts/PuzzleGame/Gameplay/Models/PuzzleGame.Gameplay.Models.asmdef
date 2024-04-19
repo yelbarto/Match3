@@ -1,0 +1,19 @@
+{
+    "name": "PuzzleGame.Gameplay.Models",
+    "rootNamespace": "",
+    "references": [
+        "GUID:8515dd880eb4f42bb95aea32a94d5ed2",
+        "GUID:8c6a206215691455cb39c702eeb07fcb",
+        "GUID:df7d42c8165624874a5258f2d7fe20a7",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

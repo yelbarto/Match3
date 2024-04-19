@@ -1,0 +1,19 @@
+{
+    "name": "PuzzleGame.MainScene.Presenters",
+    "rootNamespace": "",
+    "references": [
+        "GUID:19d7feb1dd68d4c2fb9b8581b047eb20",
+        "GUID:1b052a20c96bd4d07b112148dfe0d19d",
+        "GUID:c7f8f1f7cccf9453495b1cb161e0353a",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

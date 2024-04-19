@@ -1,0 +1,17 @@
+{
+    "name": "PuzzleGame.Gameplay.Views.Strategy",
+    "rootNamespace": "",
+    "references": [
+        "GUID:8c6a206215691455cb39c702eeb07fcb",
+        "GUID:92522a4ac9b1a40de8e820ac1dc822ba"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,26 @@
+{
+    "name": "PuzzleGame.Gameplay.Presenters",
+    "rootNamespace": "",
+    "references": [
+        "GUID:a0204201146344a39b454a77943c105f",
+        "GUID:1b052a20c96bd4d07b112148dfe0d19d",
+        "GUID:6928d884c8ad64fd986f42ebdfebe357",
+        "GUID:22079ef8224d142c5a351df4acd978a5",
+        "GUID:63a99374d454641bfb8b46acf5b08bd4",
+        "GUID:8c6a206215691455cb39c702eeb07fcb",
+        "GUID:92522a4ac9b1a40de8e820ac1dc822ba",
+        "GUID:492d7b7fcddad43688572c18d6aaf0f9",
+        "GUID:df7d42c8165624874a5258f2d7fe20a7",
+        "GUID:c7f8f1f7cccf9453495b1cb161e0353a",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

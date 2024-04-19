@@ -1,0 +1,16 @@
+{
+    "name": "PuzzleGame.MainScene.Views",
+    "rootNamespace": "",
+    "references": [
+        "GUID:e0d1bceaadd644eeb8e54a766f3c0df9"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

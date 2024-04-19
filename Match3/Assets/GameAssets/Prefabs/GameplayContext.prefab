@@ -1,0 +1,130 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2801047593560312232
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2801047593560312231}
+  - component: {fileID: 2801047593560312230}
+  - component: {fileID: 2801047593560312229}
+  - component: {fileID: 2801047594676493569}
+  m_Layer: 0
+  m_Name: GameplayContext
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2801047593560312231
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2801047593560312232}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2801047593560312230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2801047593560312232}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 431c1ee2edb745daaa2f726341804c0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levelView: {fileID: 0}
+  levelFailView: {fileID: 0}
+  gridParent: {fileID: 0}
+  gridPrefab: {fileID: 7497169680113655267, guid: 517ad27c39ee04ad29f1969359d02dc5, type: 3}
+--- !u!114 &2801047593560312229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2801047593560312232}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8740659faddc4e50a377dcf67b5bd5f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gridNonCubeAssetDataList:
+  - gridType: 1
+    gridDefaultSprite:
+    - {fileID: 21300000, guid: 138d6ae7164754a0481e8c92b864fd01, type: 3}
+    - {fileID: 21300000, guid: 5da24f15bb0c64aac9c0d077f5688861, type: 3}
+    gridPrefab: {fileID: 7478960362387811147, guid: 517ad27c39ee04ad29f1969359d02dc5, type: 3}
+    crackParticle: {fileID: 0}
+  - gridType: 2
+    gridDefaultSprite:
+    - {fileID: 21300000, guid: fb6d091340f7e40f6987c46d989adf88, type: 3}
+    gridPrefab: {fileID: 7478960362387811147, guid: 517ad27c39ee04ad29f1969359d02dc5, type: 3}
+    crackParticle: {fileID: 0}
+  - gridType: 3
+    gridDefaultSprite:
+    - {fileID: 21300000, guid: 4d045b08774a64c11ba547bcaa8fb547, type: 3}
+    gridPrefab: {fileID: 7478960362387811147, guid: 517ad27c39ee04ad29f1969359d02dc5, type: 3}
+    crackParticle: {fileID: 0}
+  - gridType: 4
+    gridDefaultSprite:
+    - {fileID: 21300000, guid: 3039d55317c0e43e887245b88af76aee, type: 3}
+    gridPrefab: {fileID: 7478960362387811147, guid: 517ad27c39ee04ad29f1969359d02dc5, type: 3}
+    crackParticle: {fileID: 0}
+  - gridType: 5
+    gridDefaultSprite:
+    - {fileID: 21300000, guid: f226178993da1427e88b32ecf2d5a6bb, type: 3}
+    gridPrefab: {fileID: 7478960362387811147, guid: 517ad27c39ee04ad29f1969359d02dc5, type: 3}
+    crackParticle: {fileID: 0}
+  - gridType: 6
+    gridDefaultSprite:
+    - {fileID: 21300000, guid: 4bf54e209896a47ef978fa6a9ecd0346, type: 3}
+    gridPrefab: {fileID: 7478960362387811147, guid: 517ad27c39ee04ad29f1969359d02dc5, type: 3}
+    crackParticle: {fileID: 0}
+  gridCubeAssetDataList:
+  - gridColor: 0
+    cubeDefaultSprite: {fileID: 21300000, guid: 01d666ec5fc2a4517bd1cef829cd1166, type: 3}
+    cubeRocketSprite: {fileID: 21300000, guid: 91fea898e3aef483dbd4c6bd2de8fbb6, type: 3}
+    cubeTntSprite: {fileID: 21300000, guid: 673825c09ef1d4789a86caa938371873, type: 3}
+    crackParticle: {fileID: 0}
+  - gridColor: 1
+    cubeDefaultSprite: {fileID: 21300000, guid: 9fb3e7235c37f44e0a7ffabf3ccb382e, type: 3}
+    cubeRocketSprite: {fileID: 21300000, guid: b9d6c709375ba4b73b7d3176487c96e5, type: 3}
+    cubeTntSprite: {fileID: 21300000, guid: 0650b7adf39c64e188fe2317992283a7, type: 3}
+    crackParticle: {fileID: 0}
+  - gridColor: 2
+    cubeDefaultSprite: {fileID: 21300000, guid: f224443c23f364fe59ec67f36955e46c, type: 3}
+    cubeRocketSprite: {fileID: 21300000, guid: d9dd941d63d2749eab45521bd179f70b, type: 3}
+    cubeTntSprite: {fileID: 21300000, guid: 57315e3a5b8334582909dd54c4117776, type: 3}
+    crackParticle: {fileID: 0}
+  - gridColor: 3
+    cubeDefaultSprite: {fileID: 21300000, guid: aca78c6853f6a442cb37ef83b9c40e3a, type: 3}
+    cubeRocketSprite: {fileID: 21300000, guid: 669d2ce241dd14be4a839880455a6ba5, type: 3}
+    cubeTntSprite: {fileID: 21300000, guid: c8896b2ae7752437abce6b032616f96c, type: 3}
+    crackParticle: {fileID: 0}
+--- !u!114 &2801047594676493569
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2801047593560312232}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dec8c6127214eb1b7c047ae9fb9e3dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  creationHeightOffset: 5

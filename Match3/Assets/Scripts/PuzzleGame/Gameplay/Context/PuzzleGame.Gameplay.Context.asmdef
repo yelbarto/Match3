@@ -1,0 +1,19 @@
+{
+    "name": "PuzzleGame.Gameplay.Context",
+    "rootNamespace": "",
+    "references": [
+        "GUID:7d4061001132947ac823653993627161",
+        "GUID:a0204201146344a39b454a77943c105f",
+        "GUID:9389978d16e8a48018ed4868c512e29e",
+        "GUID:1b052a20c96bd4d07b112148dfe0d19d"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

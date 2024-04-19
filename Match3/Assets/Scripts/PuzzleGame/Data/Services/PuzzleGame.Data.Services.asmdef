@@ -1,0 +1,16 @@
+{
+    "name": "PuzzleGame.Data.Services",
+    "rootNamespace": "",
+    "references": [
+        "GUID:df7d42c8165624874a5258f2d7fe20a7"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

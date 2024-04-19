@@ -1,0 +1,24 @@
+{
+    "name": "PuzzleGame.Gameplay.Views",
+    "rootNamespace": "",
+    "references": [
+        "GUID:492d7b7fcddad43688572c18d6aaf0f9",
+        "GUID:8204e9fb9d95446e3829c2c6c2f6917f",
+        "GUID:8c6a206215691455cb39c702eeb07fcb",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "GUID:c15b35d898582401ca0a282eceafde39",
+        "GUID:63a99374d454641bfb8b46acf5b08bd4",
+        "GUID:c882acb0c74664f4592f52bb988513f4",
+        "GUID:92522a4ac9b1a40de8e820ac1dc822ba",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

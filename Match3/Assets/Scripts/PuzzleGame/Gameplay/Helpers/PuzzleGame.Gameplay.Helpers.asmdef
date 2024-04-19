@@ -1,0 +1,16 @@
+{
+    "name": "PuzzleGame.Gameplay.Helpers",
+    "rootNamespace": "",
+    "references": [
+        "GUID:8c6a206215691455cb39c702eeb07fcb"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
