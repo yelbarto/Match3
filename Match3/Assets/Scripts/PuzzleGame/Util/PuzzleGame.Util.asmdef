@@ -1,3 +1,17 @@
 {
-	"name": "PuzzleGame.Util"
+    "name": "PuzzleGame.Util",
+    "rootNamespace": "",
+    "references": [
+        "GUID:63a99374d454641bfb8b46acf5b08bd4",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

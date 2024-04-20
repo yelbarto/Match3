@@ -17,7 +17,7 @@ namespace PuzzleGame.Gameplay.Models
         public int CreationHeightOffset { get; set; }
         public Vector2Int Position { get; private set; }
 
-        public event Action OnMatchEffectedGrid;
+        public event Action<GridType> OnMatchEffectedGrid;
         public event Action OnDropGrid;
 
         protected GridModel(GridType gridType, int id, BreakableModelStrategy breakableModelStrategy, int health)
@@ -39,13 +39,13 @@ namespace PuzzleGame.Gameplay.Models
             OnDropGrid?.Invoke();
         }
 
-        public bool MatchEffectedGrid(bool isSpecialMatch)
+        public bool MatchEffectedGrid(bool isSpecialMatch, GridType otherGridType)
         {
             var canBreak = _breakableModelStrategy.TryBreak(isSpecialMatch);
             if (canBreak)
             {
                 Health--;
-                OnMatchEffectedGrid?.Invoke();
+                OnMatchEffectedGrid?.Invoke(otherGridType);
             }
 
             return Health == 0;

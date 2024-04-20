@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using PuzzleGame.Gameplay.DataStructures;
 using UnityEngine;
 
 namespace PuzzleGame.Gameplay.Models.Strategy
@@ -62,13 +63,5 @@ namespace PuzzleGame.Gameplay.Models.Strategy
             effectedPositions.Remove(position);
             return effectedPositions.ToArray();
         }
-    }
-    
-    
-
-    public enum Direction
-    {
-        Vertical,
-        Horizontal
     }
 }

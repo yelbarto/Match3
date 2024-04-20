@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using PuzzleGame.Gameplay.Helpers;
 using UnityEngine;
 
 namespace PuzzleGame.Gameplay.Models.Strategy
@@ -48,22 +49,7 @@ namespace PuzzleGame.Gameplay.Models.Strategy
 
         private Vector2Int[] CalculatedTntEffectedArea(Vector2Int position, int range)
         {
-            var minX = Mathf.Max(0, position.x - range);
-            var minY = Mathf.Max(0, position.y - range);
-            var maxX = Mathf.Min(Borders.x - 1, position.x + range);
-            var maxY = Mathf.Min(Borders.y - 1, position.y + range);
-            var effectedPositions = new Vector2Int[(maxX - minX + 1) * (maxY - minY + 1)];
-            var index = 0;
-            for (var x = minX; x <= maxX; x++)
-            {
-                for (var y = minY; y <= maxY; y++)
-                {
-                    effectedPositions[index] = new Vector2Int(x, y);
-                    index++;
-                }
-            }
-
-            return effectedPositions;
+            return EffectedAreaCalculator.CalculatedTntEffectedArea(Borders, position, range);
         }
     }
 }

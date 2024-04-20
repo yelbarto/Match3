@@ -1,5 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using PuzzleGame.Util.Pool;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -10,35 +14,44 @@ namespace PuzzleGame.Util
     {
         public ParticleSystem[] particleSystems;
     }
-    
+
     [Serializable]
     internal class AlternativeGroup
     {
         public ParticleSystem[] particleSystems;
     }
-    
-    public class RandomizedParticleSystem : MonoBehaviour
+
+    public class RandomizedParticleSystem : MonoBehaviour, IPoolable
     {
         [SerializeField] private ParticleSystem targetParticleSystem;
         [SerializeField] private ParticleSystem[] additionalParticleSystems;
 
-        [SerializeField, BoxGroup("Synced Seed"), Tooltip("Will set the seed of all particle systems in the seed groups to a random value between the range.")] 
+        [SerializeField, BoxGroup("Synced Seed"),
+         Tooltip("Will set the seed of all particle systems in the seed groups to a random value between the range.")]
         private bool syncSeeds;
-        [SerializeField, BoxGroup("Synced Seed"), ShowIf(nameof(syncSeeds))] 
+
+        [SerializeField, BoxGroup("Synced Seed"), ShowIf(nameof(syncSeeds))]
         private Vector2Int seedRange = new Vector2Int(-2147483647, 2147483647);
-        [SerializeField, BoxGroup("Synced Seed"), ShowIf(nameof(syncSeeds))] 
+
+        [SerializeField, BoxGroup("Synced Seed"), ShowIf(nameof(syncSeeds))]
         private SeedGroup[] seedGroups;
-        
-        [SerializeField, BoxGroup("Alternatives")] 
+
+        [SerializeField, BoxGroup("Alternatives")]
         private bool randomizeAlternatives;
-        [SerializeField, BoxGroup("Alternatives"), ShowIf(nameof(randomizeAlternatives))] 
+
+        [SerializeField, BoxGroup("Alternatives"), ShowIf(nameof(randomizeAlternatives))]
         private AlternativeGroup[] alternativeGroups;
 
+        [SerializeField] private List<ParticleSizeData> particleSizeDataList;
+
         public ParticleSystem Settings => targetParticleSystem;
-        
+
         [BoxGroup("Debug"), Button(ButtonSizes.Medium), GUIColor(0.8f, 0.8f, 0.8f)]
-        public void Play()
+        public void Play(ParticleSize size = ParticleSize.Medium)
         {
+            targetParticleSystem.transform.localScale =
+                Vector3.one * particleSizeDataList.First(p => p.ParticleSize == size).SizeMultiplier;
+
             if (syncSeeds)
             {
                 Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
@@ -48,7 +61,7 @@ namespace PuzzleGame.Util
                     foreach (var particle in seedGroup.particleSystems)
                     {
                         particle.useAutoRandomSeed = false;
-                        particle.randomSeed = (uint) seed;
+                        particle.randomSeed = (uint)seed;
                     }
                 }
             }
@@ -65,15 +78,28 @@ namespace PuzzleGame.Util
                     }
                 }
             }
-            
+
             targetParticleSystem.Play();
         }
-        
-        public void Stop(bool withChildren = false, ParticleSystemStopBehavior stopBehavior = ParticleSystemStopBehavior.StopEmitting)
+
+        public async UniTask WaitForStop(CancellationToken token)
+        {
+            await UniTask.NextFrame(token);
+            while (true)
+            {
+                if (additionalParticleSystems.All(p => !p.isPlaying) &&
+                    seedGroups.All(g => g.particleSystems.All(p => !p.isPlaying)))
+                    break;
+                await UniTask.Yield(token);
+            }
+        }
+
+        public void Stop(bool withChildren = false,
+            ParticleSystemStopBehavior stopBehavior = ParticleSystemStopBehavior.StopEmitting)
         {
             targetParticleSystem.Stop(withChildren, stopBehavior);
         }
-        
+
         [Button]
         public void SetColors(Color tileColor, GradientAlphaKey[] alphaKeys)
         {
@@ -91,6 +117,7 @@ namespace PuzzleGame.Util
                     SetColor(particle, tileColor, newGradient);
                 }
             }
+
             foreach (var alternativeGroup in seedGroups)
             {
                 foreach (var particle in alternativeGroup.particleSystems)
@@ -98,6 +125,7 @@ namespace PuzzleGame.Util
                     SetColor(particle, tileColor, newGradient);
                 }
             }
+
             foreach (var particle in additionalParticleSystems)
             {
                 SetColor(particle, tileColor, newGradient);
@@ -111,5 +139,31 @@ namespace PuzzleGame.Util
             var colorOverLifetimeModule = particle.colorOverLifetime;
             colorOverLifetimeModule.color = new ParticleSystem.MinMaxGradient(newGradient);
         }
+
+        public void OnDespawn()
+        {
+            Stop();
+        }
+
+        public void OnSpawn()
+        {
+        }
+    }
+
+    [Serializable]
+    public struct ParticleSizeData
+    {
+        [SerializeField] private ParticleSize particleSize;
+        [SerializeField] private float sizeMultiplier;
+
+        public ParticleSize ParticleSize => particleSize;
+        public float SizeMultiplier => sizeMultiplier;
+    }
+
+    public enum ParticleSize
+    {
+        Small,
+        Medium,
+        Large
     }
 }

@@ -3,6 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using PuzzleGame.Gameplay.DataStructures;
+using PuzzleGame.Gameplay.Helpers;
 using PuzzleGame.Gameplay.Views.Strategy;
 using PuzzleGame.Util;
 using PuzzleGame.Util.Pool;
@@ -13,43 +14,50 @@ namespace PuzzleGame.Gameplay.Views
 {
     public class GridView : MonoBehaviour, IPoolable
     {
-        [SerializeField] protected SpriteRenderer itemImage;
-        [SerializeField] protected GameObjectInputComponent inputComponent;
+        private const string DROP = "Drop Parameters";
+        private const string REF = "References";
+        
+        [SerializeField, FoldoutGroup(REF)] private SpriteRenderer itemImage;
+        [SerializeField, FoldoutGroup(REF)] private GameObjectInputComponent inputComponent;
 
-        [SerializeField] private float dropDuration;
-        [SerializeField] private AnimationCurve dropEase;
-        [SerializeField] private AnimationCurve dropSpeedEase;
-        [SerializeField] private float minSpeedValue = 3f;
-        [SerializeField] private float maxSpeedValue = 20f;
-        [SerializeField] private float dropMoveMaxDif = 3f;
-        [SerializeField] private float dropMoveMinDif = 2f;
-        [SerializeField] private float dropOffset = 0.03f;
+        [SerializeField, FoldoutGroup(DROP)] private AnimationCurve dropEase;
+        [SerializeField, FoldoutGroup(DROP)] private AnimationCurve dropSpeedEase;
+        [SerializeField, FoldoutGroup(DROP)] private float minSpeedValue = 3f;
+        [SerializeField, FoldoutGroup(DROP)] private float maxSpeedValue = 20f;
+        [SerializeField, FoldoutGroup(DROP)] private float dropOffsetAmount = 0.03f;
         
 
         public event Action OnGridClicked;
 
         private Transform _transform;
         private GridType _gridType;
+        private GridColor _gridColor;
         private GridViewStrategy _gridViewStrategy;
         private int _currentDropOffset;
         private CancellationTokenSource _dropCts;
+        private CancellationTokenSource _spawnCts;
+        private CancellationTokenSource _lifetimeCts;
 
-        protected virtual void Awake()
+        private void Awake()
         {
             _transform = transform;
             inputComponent.OnObjectClicked += () => OnGridClicked?.Invoke();
+            _lifetimeCts = new CancellationTokenSource();
         }
 
         public void SetUp(GridType gridType, bool interactable, Vector2Int position,
-            GridViewStrategy gridViewStrategy, int dropOffset)
+            GridViewStrategy gridViewStrategy, int dropOffset, GridColor gridColor)
         {
             _gridViewStrategy = gridViewStrategy;
             SetCommonValues(gridType, position);
             SetInteractable(interactable);
             _currentDropOffset = dropOffset;
+            _gridColor = gridColor;
+            if (gridType is GridType.Vase or GridType.Box or GridType.Stone)
+                _spawnCts = new CancellationTokenSource();
         }
 
-        protected void SetCommonValues(GridType gridType, Vector2Int position)
+        private void SetCommonValues(GridType gridType, Vector2Int position)
         {
             _gridType = gridType;
             SetPosition(position);
@@ -72,7 +80,22 @@ namespace PuzzleGame.Gameplay.Views
                 itemImage.sprite = currentSprite;
         }
 
-        public void DropGridSpeedBase(Vector2Int position)
+        [Button]
+        public void CrackGrid(GridViewStrategy strategy)
+        {
+            CrackGridAsync(strategy).Forget();
+        }
+
+        private async UniTask CrackGridAsync(GridViewStrategy strategy)
+        {
+            gameObject.SetActive(false);
+            if (strategy != null)
+                await _gridViewStrategy.PlaySuperBreakAnimation(_transform, _transform.position, strategy);
+            else
+                await _gridViewStrategy.PlayBreakAnimation(_transform, _transform.position);
+        }
+
+        public void DropGrid(Vector2Int position)
         {
             DropGridSpeedBaseAsync(position).Forget();
         }
@@ -83,7 +106,7 @@ namespace PuzzleGame.Gameplay.Views
             _dropCts = new CancellationTokenSource();
             if (_currentDropOffset != 0)
             {
-                await UniTask.Delay(TimeSpan.FromSeconds(dropOffset * _currentDropOffset),
+                await UniTask.Delay(TimeSpan.FromSeconds(dropOffsetAmount * _currentDropOffset),
                     cancellationToken: _dropCts.Token);
                 _currentDropOffset = 0;
             }
@@ -95,46 +118,42 @@ namespace PuzzleGame.Gameplay.Views
                 .SetSpeedBased();
         }
 
-        public void DropGrid(Vector2Int position)
-        {
-            _transform.DOKill();
-            var diffY = _transform.localPosition.y - position.y;
-            if (diffY > dropMoveMaxDif)
-                diffY = dropMoveMaxDif;
-            else if (diffY < dropMoveMinDif)
-                diffY = dropMoveMinDif;
-            _transform.DOLocalMove(GetPosition(position), dropDuration * diffY).SetEase(dropEase);
-        }
-
-        [Button]
-        public void DropGridTest(Vector2Int initialPosition, Vector2Int endPosition, bool isSpeed, float speed)
-        {
-            SetPosition(initialPosition);
-            if (isSpeed)
-            {
-                _transform.DOLocalMove(GetPosition(endPosition), speed).SetEase(dropEase)
-                    .SetSpeedBased();
-            }
-            else
-                DropGrid(endPosition);
-        }
-
         public void SetInteractable(bool interactable)
         {
             inputComponent.SetInteractable(interactable);
         }
-        
+
+        private void OnDestroy()
+        {
+            _spawnCts?.Cancel();
+            _lifetimeCts?.Cancel();
+        }
+
         public void OnDespawn()
         {
             itemImage.sprite = null;
             inputComponent.SetInteractable(false);
             gameObject.SetActive(false);
+            _spawnCts?.Cancel();
             _dropCts?.Cancel();
         }
 
         public void OnSpawn()
         {
+            _spawnCts?.Cancel();
+            _spawnCts = new CancellationTokenSource();
             gameObject.SetActive(true);
         }
+
+        #region Debug
+
+        [Button]
+        public void DropGridTest(Vector2Int initialPosition, Vector2Int endPosition, float speed)
+        {
+            SetPosition(initialPosition);
+            _transform.DOLocalMove(GetPosition(endPosition), speed).SetEase(dropEase).SetSpeedBased();
+        }
+
+        #endregion
     }
 }

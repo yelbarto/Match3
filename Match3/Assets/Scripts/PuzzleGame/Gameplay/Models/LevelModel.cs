@@ -268,7 +268,10 @@ namespace PuzzleGame.Gameplay.Models
                 {
                     var effectedGrid = _gridData[gridPosition.x, gridPosition.y];
                     if (effectedGrid is null) continue;
-                    if (!effectedGrid.MatchEffectedGrid(true)) continue;
+                    GridType otherGridType = GridType.Default;
+                    if (effectedGrid == gridModel && adjacentGrid != null)
+                        otherGridType = adjacentGrid.GridType;
+                    if (!effectedGrid.MatchEffectedGrid(true, otherGridType)) continue;
                     _gridData[effectedGrid.Position.x, effectedGrid.Position.y] = null;
                     if (!effectedGrid.IsObstacle) continue;
                     if (!brokenObstacles.TryAdd(effectedGrid.GridType, 1))
@@ -287,13 +290,13 @@ namespace PuzzleGame.Gameplay.Models
                     obstacleList);
                 foreach (var cube in cubeList)
                 {
-                    cube.MatchEffectedGrid(false);
+                    cube.MatchEffectedGrid(false, GridType.Default);
                     _gridData[cube.Position.x, cube.Position.y] = null;
                 }
 
                 foreach (var obstacleModel in obstacleList)
                 {
-                    var isDestroyed = obstacleModel.MatchEffectedGrid(false);
+                    var isDestroyed = obstacleModel.MatchEffectedGrid(false, GridType.Default);
                     if (!isDestroyed) continue;
                     _gridData[obstacleModel.Position.x, obstacleModel.Position.y] = null;
                     if (!brokenObstacles.TryAdd(obstacleModel.GridType, 1))

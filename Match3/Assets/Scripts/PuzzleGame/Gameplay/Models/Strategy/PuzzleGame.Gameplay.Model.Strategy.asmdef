@@ -1,3 +1,4 @@
 {
-	"name": "PuzzleGame.Gameplay.Model.Strategy"
+	"name": "PuzzleGame.Gameplay.Model.Strategy",
+	"references":[ "GUID:8c6a206215691455cb39c702eeb07fcb", "GUID:92522a4ac9b1a40de8e820ac1dc822ba" ]
 }

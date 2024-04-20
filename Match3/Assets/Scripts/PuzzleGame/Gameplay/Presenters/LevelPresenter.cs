@@ -89,7 +89,7 @@ namespace PuzzleGame.Gameplay.Presenters
         private void CreateGrid(GridModel gridModel, bool shouldCreateAtModelLocation)
         {
             var gridPresenter = _gridPresenterFactory.Create();
-            gridPresenter.SetUp(gridModel, shouldCreateAtModelLocation, _levelModel.BoardSize.y);
+            gridPresenter.SetUp(gridModel, shouldCreateAtModelLocation, _levelModel.BoardSize);
             gridPresenter.OnGridMatched += MatchGrid;
             gridPresenter.OnGridDestroyed += OnGridDestroyed;
             _gridPresenters.Add(gridPresenter);

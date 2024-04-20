@@ -1,4 +1,5 @@
 using System;
+using Cysharp.Threading.Tasks;
 using PuzzleGame.Gameplay.Context;
 using PuzzleGame.Gameplay.DataStructures;
 using PuzzleGame.Gameplay.Models;
@@ -21,7 +22,7 @@ namespace PuzzleGame.Gameplay.Presenters
         private GridView _gridView;
         private GridType _gridType;
         private GridModel _gridModel;
-        private int _boardHeight;
+        private Vector2Int _boardBorders;
 
         public GridPresenter(GameObjectPool<GridView> gridViewPool, ViewPrefabContainer viewPrefabContainer)
         {
@@ -29,10 +30,10 @@ namespace PuzzleGame.Gameplay.Presenters
             _viewPrefabContainer = viewPrefabContainer;
         }
 
-        public void SetUp(GridModel gridModel, bool shouldCreateAtModelLocation, int boardHeight)
+        public void SetUp(GridModel gridModel, bool shouldCreateAtModelLocation, Vector2Int boardBorders)
         {
             _gridType = gridModel.GridType;
-            _boardHeight = boardHeight;
+            _boardBorders = boardBorders;
             _gridModel = gridModel;
             CreateGridView(shouldCreateAtModelLocation);
             _gridView.OnGridClicked += OnGridClicked;
@@ -51,7 +52,7 @@ namespace PuzzleGame.Gameplay.Presenters
             var offset = 0;
             if (!shouldCreateAtModelLocation)
             {
-                position = new Vector2Int(_gridModel.Position.x, _boardHeight + _gridModel.CreationHeightOffset + 
+                position = new Vector2Int(_gridModel.Position.x, _boardBorders.y + _gridModel.CreationHeightOffset +
                                                                  GameplayVariables.Instance.CreationHeightOffset);
                 offset = _gridModel.CreationHeightOffset;
             }
@@ -59,6 +60,7 @@ namespace PuzzleGame.Gameplay.Presenters
             {
                 position = _gridModel.Position;
             }
+
             if (_gridType is GridType.Cube)
             {
                 var cubeView = _gridViewPool.Get();
@@ -66,10 +68,33 @@ namespace PuzzleGame.Gameplay.Presenters
 
                 _gridView = cubeView;
                 cubeModel.OnStateChanged += OnStateChanged;
-                var cubeViewStrategy = new CubeViewStrategy();
-                cubeViewStrategy.SetStrategyState(cubeModel.Color);
-                _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, cubeViewStrategy, offset);
+                var cubeViewStrategy = new CubeViewStrategy(cubeModel.Color);
+                _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, cubeViewStrategy, offset,
+                    cubeModel.Color);
                 _gridView.SetSprite(_gridModel.Health, cubeModel.State);
+            }
+            else if (_gridModel.IsSpecialItem)
+            {
+                _gridView = _gridViewPool.Get();
+                GridViewStrategy strategy;
+                switch (_gridType)
+                {
+                    case GridType.HorizontalRocket:
+                    case GridType.VerticalRocket:
+                        strategy = new RocketViewStrategy(_gridType);
+                        break;
+                    case GridType.Tnt:
+                        var verticalRocketStrategy = new RocketViewStrategy(GridType.VerticalRocket);
+                        var horizontalRocketStrategy = new RocketViewStrategy(GridType.HorizontalRocket);
+                        strategy = new TntViewStrategy(_boardBorders, verticalRocketStrategy, horizontalRocketStrategy);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+
+                _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, strategy, offset, GridColor.Default);
+                _gridView.SetSprite(_gridModel.Health, GridState.Default);
             }
             else
             {
@@ -80,8 +105,12 @@ namespace PuzzleGame.Gameplay.Presenters
                 {
                     case GridType.HorizontalRocket:
                     case GridType.VerticalRocket:
+                        strategy = new RocketViewStrategy(_gridType);
+                        break;
                     case GridType.Tnt:
-                        strategy = new SpecialItemViewStrategy(_gridModel.GridType);
+                        var verticalRocketStrategy = new RocketViewStrategy(GridType.VerticalRocket);
+                        var horizontalRocketStrategy = new RocketViewStrategy(GridType.HorizontalRocket);
+                        strategy = new TntViewStrategy(_boardBorders, verticalRocketStrategy, horizontalRocketStrategy);
                         break;
                     case GridType.Box:
                         strategy = new ObstacleViewStrategy(_gridModel.GridType);
@@ -96,17 +125,17 @@ namespace PuzzleGame.Gameplay.Presenters
                         throw new ArgumentOutOfRangeException();
                 }
 
-                _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, strategy, offset);
+                _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, strategy, offset, GridColor.Default);
                 _gridView.SetSprite(_gridModel.Health, GridState.Default);
             }
         }
 
         private void OnDropGrid()
         {
-            _gridView.DropGridSpeedBase(_gridModel.Position);
+            _gridView.DropGrid(_gridModel.Position);
         }
 
-        private void OnMatchEffected()
+        private void OnMatchEffected(GridType otherEffectedType)
         {
             if (_gridModel is SpecialItemModel { IsUsed: false })
             {
@@ -115,6 +144,30 @@ namespace PuzzleGame.Gameplay.Presenters
 
             if (_gridModel.Health == 0)
             {
+                GridViewStrategy strategy = null;
+                switch (otherEffectedType)
+                {
+                    case GridType.Default:
+                    case GridType.Cube:
+                    case GridType.Vase:
+                    case GridType.Stone:
+                    case GridType.Box:
+                        break;
+                    case GridType.VerticalRocket:
+                        strategy = new RocketViewStrategy(GridType.VerticalRocket);
+                        break;
+                    case GridType.HorizontalRocket:
+                        strategy = new RocketViewStrategy(GridType.HorizontalRocket);
+                        break;
+                    case GridType.Tnt:
+                        strategy = new TntViewStrategy(_boardBorders, 
+                            new RocketViewStrategy(GridType.VerticalRocket), 
+                            new RocketViewStrategy(GridType.HorizontalRocket));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(otherEffectedType), otherEffectedType, null);
+                }
+                _gridView.CrackGrid(strategy);
                 OnGridDestroyed?.Invoke(this);
             }
             else

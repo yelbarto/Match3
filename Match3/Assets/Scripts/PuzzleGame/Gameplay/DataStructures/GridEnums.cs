@@ -2,6 +2,7 @@ namespace PuzzleGame.Gameplay.DataStructures
 {
     public enum GridType
     {
+        Default = -1,
         Cube,
         Vase,
         Stone,
@@ -13,6 +14,7 @@ namespace PuzzleGame.Gameplay.DataStructures
     
     public enum GridColor
     {
+        Default = -1,
         Red = 0,
         Green = 1,
         Blue = 2,
@@ -26,5 +28,11 @@ namespace PuzzleGame.Gameplay.DataStructures
         Interactable,
         Rocket,
         Tnt
+    }
+    
+    public enum Direction
+    {
+        Vertical,
+        Horizontal
     }
 }

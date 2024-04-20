@@ -2,7 +2,9 @@
     "name": "PuzzleGame.Gameplay.Helpers",
     "rootNamespace": "",
     "references": [
-        "GUID:8c6a206215691455cb39c702eeb07fcb"
+        "GUID:8c6a206215691455cb39c702eeb07fcb",
+        "GUID:c15b35d898582401ca0a282eceafde39",
+        "GUID:63a99374d454641bfb8b46acf5b08bd4"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
