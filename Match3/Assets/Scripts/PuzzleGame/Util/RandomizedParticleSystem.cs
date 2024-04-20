@@ -25,6 +25,7 @@ namespace PuzzleGame.Util
     {
         [SerializeField] private ParticleSystem targetParticleSystem;
         [SerializeField] private ParticleSystem[] additionalParticleSystems;
+        [SerializeField] private float particleLifetime = 1f;
 
         [SerializeField, BoxGroup("Synced Seed"),
          Tooltip("Will set the seed of all particle systems in the seed groups to a random value between the range.")]
@@ -84,14 +85,7 @@ namespace PuzzleGame.Util
 
         public async UniTask WaitForStop(CancellationToken token)
         {
-            await UniTask.NextFrame(token);
-            while (true)
-            {
-                if (additionalParticleSystems.All(p => !p.isPlaying) &&
-                    seedGroups.All(g => g.particleSystems.All(p => !p.isPlaying)))
-                    break;
-                await UniTask.Yield(token);
-            }
+            await UniTask.Delay(TimeSpan.FromSeconds(particleLifetime), cancellationToken: token);
         }
 
         public void Stop(bool withChildren = false,

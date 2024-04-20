@@ -23,7 +23,7 @@ namespace PuzzleGame.Gameplay.Views.Strategy
         {
             var particleSystem = GridParticleProvider.Instance.GetRandomizedParticleSystem(GridType, GridColor.Default);
             var rocketComponent = particleSystem.GetComponent<RocketAnimationComponent>();
-            await rocketComponent.PlayAnimationAsync(zeroPointPosition.position, _topRightPosition, 
+            await rocketComponent.PlayAnimationAsync(position, _topRightPosition, 
                 _bottomLeftPosition);
         }
 
@@ -36,7 +36,7 @@ namespace PuzzleGame.Gameplay.Views.Strategy
             }
             else
             {
-                await PlayBreakAnimation(zeroPointPosition, position);
+                PlayBreakAnimation(zeroPointPosition, position).Forget();
                 await otherBrokenGrid.PlayBreakAnimation(zeroPointPosition, position);
             }
         }

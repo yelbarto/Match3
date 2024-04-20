@@ -4791,6 +4791,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetParticleSystem: {fileID: 4575151349910120287}
   additionalParticleSystems: []
+  particleLifetime: 1
   syncSeeds: 0
   seedRange: {x: -2147483647, y: 2147483647}
   seedGroups: []
@@ -4802,7 +4803,7 @@ MonoBehaviour:
   - particleSize: 1
     sizeMultiplier: 7.5
   - particleSize: 2
-    sizeMultiplier: 9
+    sizeMultiplier: 10
 --- !u!1 &1576653940963978791
 GameObject:
   m_ObjectHideFlags: 0

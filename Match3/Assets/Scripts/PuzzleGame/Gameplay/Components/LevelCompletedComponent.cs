@@ -55,15 +55,17 @@ namespace PuzzleGame.Gameplay.Components
         {
             _openCts?.Cancel();
             _openCts = new CancellationTokenSource();
-            //TODO: Add token for DOTween
             gameObject.SetActive(true);
-            imageAnimationTransform.DOScale(1, openAnimationDuration).SetEase(openAnimationEase);
+            imageAnimationTransform.DOScale(1, openAnimationDuration).SetEase(openAnimationEase)
+                .ToUniTask(TweenCancelBehaviour.CompleteAndCancelAwait, _openCts.Token).Forget();
             await UniTask.Delay(TimeSpan.FromSeconds(firstAnimationParticleDelay), cancellationToken: _openCts.Token);
             starParticleSystem.Play();
             await UniTask.Delay(TimeSpan.FromSeconds(firstAnimationDelay), cancellationToken: _openCts.Token);
-            textAnimationTransform.DOScale(1, openAnimationDuration).SetEase(openAnimationEase);
+            textAnimationTransform.DOScale(1, openAnimationDuration).SetEase(openAnimationEase)
+                .ToUniTask(TweenCancelBehaviour.CompleteAndCancelAwait, _openCts.Token).Forget();
             await UniTask.Delay(TimeSpan.FromSeconds(secondAnimationDelay), cancellationToken: _openCts.Token);
-            tapToContinueText.DOFade(1, tapToContinueFadeDuration).SetEase(tapToContinueFadeEase);
+            tapToContinueText.DOFade(1, tapToContinueFadeDuration).SetEase(tapToContinueFadeEase)
+                .ToUniTask(TweenCancelBehaviour.CompleteAndCancelAwait, _openCts.Token).Forget();
             closeButton.interactable = true;
         }
 
@@ -72,9 +74,6 @@ namespace PuzzleGame.Gameplay.Components
             closeButton.interactable = false;
             _closeCallback?.Invoke();
             _closeCallback = null;
-            // GameplayTintComponent.Instance.Close();
-            // _openCts?.Cancel();
-            // gameObject.SetActive(false);
         }
     }
 }

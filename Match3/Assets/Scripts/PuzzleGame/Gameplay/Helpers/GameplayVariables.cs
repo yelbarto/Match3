@@ -1,3 +1,4 @@
+using System.Threading;
 using UnityEngine;
 
 namespace PuzzleGame.Gameplay.Context
@@ -11,13 +12,17 @@ namespace PuzzleGame.Gameplay.Context
         public int CreationHeightOffset => creationHeightOffset;
         public Transform BottomLeftRocketPositioner => bottomLeftRocketPositioner;
         public Transform TopRightRocketPositioner => topRightRocketPositioner;
+        public CancellationToken LifetimeToken => _lifetimeCts.Token;
         
         public static GameplayVariables Instance { get; private set; }
+        
+        private CancellationTokenSource _lifetimeCts;
         
         private void Awake()
         {
             if (Instance == null)
             {
+                _lifetimeCts = new CancellationTokenSource();
                 Instance = this;
             }
             else
@@ -30,6 +35,7 @@ namespace PuzzleGame.Gameplay.Context
         {
             if (Instance == this)
             {
+                _lifetimeCts?.Cancel();
                 Instance = null;
             }
         }

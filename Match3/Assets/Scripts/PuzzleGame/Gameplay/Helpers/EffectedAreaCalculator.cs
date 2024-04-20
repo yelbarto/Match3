@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace PuzzleGame.Gameplay.Helpers
@@ -22,6 +23,21 @@ namespace PuzzleGame.Gameplay.Helpers
             }
 
             return effectedPositions;
+        }
+        
+        public static Vector2Int[] GetAdjacentPositions(Vector2Int borders, Vector2Int position)
+        {
+            var adjacentPositions = new List<Vector2Int>();
+            if (position.x + 1 < borders.x)
+                adjacentPositions.Add(new Vector2Int(position.x + 1, position.y));
+            if (position.x - 1 >= 0)
+                adjacentPositions.Add(new Vector2Int(position.x - 1, position.y));
+            if (position.y + 1 < borders.y)
+                adjacentPositions.Add(new Vector2Int(position.x, position.y + 1));
+            if (position.y - 1 >= 0)
+                adjacentPositions.Add(new Vector2Int(position.x, position.y - 1));
+            adjacentPositions.Add(position);
+            return adjacentPositions.ToArray();
         }
     }
 }

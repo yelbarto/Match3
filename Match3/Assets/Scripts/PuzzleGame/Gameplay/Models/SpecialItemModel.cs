@@ -7,6 +7,7 @@ namespace PuzzleGame.Gameplay.Models
     public class SpecialItemModel : GridModel
     {
         public bool IsUsed { get; private set; }
+        public bool UsedInCombination { get; private set; }
         
         private readonly SpecialItemModelStrategy _strategy;
 
@@ -21,6 +22,7 @@ namespace PuzzleGame.Gameplay.Models
 
         public SpecialItemModelStrategy UseAsCombinedSpecialItem()
         {
+            UsedInCombination = true;
             IsUsed = true;
             return _strategy;
         }

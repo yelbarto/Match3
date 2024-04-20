@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using PuzzleGame.Gameplay.DataStructures;
-using PuzzleGame.Util;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -16,9 +14,8 @@ namespace PuzzleGame.Gameplay.Components
         [SerializeField] private Transform secondRocket;
         [SerializeField] private Direction direction;
         [SerializeField] private float rocketSpeed = 0.5f;
+        [SerializeField] private float rocketDuration = 2f;
         [SerializeField] private Ease rocketEase = Ease.OutSine;
-        [SerializeField] private RandomizedParticleSystem firstParticleSystem;
-        [SerializeField] private RandomizedParticleSystem secondParticleSystem;
 
         private CancellationTokenSource _animationCts;
 
@@ -47,8 +44,10 @@ namespace PuzzleGame.Gameplay.Components
             }
 
 
-            firstRocket.DOMove(firstRocketPosition, rocketSpeed).SetEase(rocketEase).SetSpeedBased();
-            secondRocket.DOMove(secondRocketPosition, rocketSpeed).SetEase(rocketEase).SetSpeedBased();
+            firstRocket.DOMove(firstRocketPosition, rocketSpeed).SetEase(rocketEase).SetSpeedBased()
+                .ToUniTask(TweenCancelBehaviour.CompleteAndCancelAwait, _animationCts.Token).Forget();
+            secondRocket.DOMove(secondRocketPosition, rocketSpeed).SetEase(rocketEase).SetSpeedBased()
+                .ToUniTask(TweenCancelBehaviour.CompleteAndCancelAwait, _animationCts.Token).Forget();
             await CleanUpAsync(_animationCts.Token);
         }
 
@@ -64,11 +63,13 @@ namespace PuzzleGame.Gameplay.Components
         
         private async UniTask CleanUpAsync(CancellationToken token)
         {
-            //TODO: Not working correct
-            // await firstParticleSystem.WaitForStop(token);
-            // await secondParticleSystem.WaitForStop(token);
-            await UniTask.Delay(TimeSpan.FromSeconds(2f), cancellationToken: token);
+            await UniTask.Delay(TimeSpan.FromSeconds(rocketDuration), cancellationToken: token);
             CleanUp();
+        }
+
+        private void OnDestroy()
+        {
+            _animationCts?.Cancel();
         }
     }
 }

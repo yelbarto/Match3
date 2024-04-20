@@ -34,39 +34,43 @@ namespace PuzzleGame.Gameplay.Views.Strategy
                 var animationTaskList = new List<UniTask> { PlayBreakAnimationWithSized(position, ParticleSize.Small) };
                 var localZeroPoint = zeroPoint.localPosition;
                 var intZeroPoint = new Vector2Int((int)localZeroPoint.x, (int)localZeroPoint.y);
-                var effectedArea = EffectedAreaCalculator.CalculatedTntEffectedArea(_border,
-                    intZeroPoint, 1);
-                foreach (var area in effectedArea)
+                var effectedArea = EffectedAreaCalculator.GetAdjacentPositions(_border,
+                    intZeroPoint);
+                PlayTntAnimations(zeroPoint, position, otherBrokenGrid, effectedArea, intZeroPoint, animationTaskList);
+
+                await animationTaskList;
+            }
+        }
+
+        private void PlayTntAnimations(Transform zeroPoint, Vector3 position, GridViewStrategy otherBrokenGrid,
+            Vector2Int[] effectedArea, Vector2Int intZeroPoint, List<UniTask> animationTaskList)
+        {
+            foreach (var area in effectedArea)
+            {
+                var xDiff = area.x - intZeroPoint.x;
+                if (xDiff != 0)
                 {
-                    var xDiff = area.x - intZeroPoint.x;
-                    if (xDiff != 0)
+                    var animationPosition = new Vector3(position.x + xDiff * zeroPoint.lossyScale.x, 
+                        position.y, position.z);
+                    animationTaskList.Add(_verticalRocketViewStrategy.PlayBreakAnimation(zeroPoint, 
+                        animationPosition));
+                }
+                else
+                {
+                    var yDiff = area.y - intZeroPoint.y;
+                    if (yDiff != 0)
                     {
-                        var animationPosition = new Vector3(position.x + xDiff * zeroPoint.lossyScale.x, 
-                            position.y, position.z);
-                        animationTaskList.Add(_verticalRocketViewStrategy.PlaySuperBreakAnimation(zeroPoint, animationPosition, 
-                            otherBrokenGrid));
+                        var animationPosition = new Vector3(position.x, 
+                            position.y + yDiff * zeroPoint.lossyScale.y, position.z);
+                        animationTaskList.Add(_horizontalRocketViewStrategy.PlayBreakAnimation(zeroPoint,
+                            animationPosition));
                     }
                     else
                     {
-                        var yDiff = area.y - intZeroPoint.y;
-                        if (yDiff != 0)
-                        {
-                            var animationPosition = new Vector3(position.x, 
-                                position.y + yDiff * zeroPoint.lossyScale.y, position.z);
-                            animationTaskList.Add(_horizontalRocketViewStrategy.PlaySuperBreakAnimation(zeroPoint, animationPosition, 
-                                otherBrokenGrid));
-                        }
-                        else
-                        {
-                            animationTaskList.Add(_horizontalRocketViewStrategy.PlaySuperBreakAnimation(zeroPoint, position,
-                                otherBrokenGrid));
-                            animationTaskList.Add(_verticalRocketViewStrategy.PlaySuperBreakAnimation(zeroPoint, position, 
-                                otherBrokenGrid));
-                        }
+                        animationTaskList.Add(_horizontalRocketViewStrategy.PlaySuperBreakAnimation(zeroPoint,
+                            position, _verticalRocketViewStrategy));
                     }
                 }
-
-                await animationTaskList;
             }
         }
     }
