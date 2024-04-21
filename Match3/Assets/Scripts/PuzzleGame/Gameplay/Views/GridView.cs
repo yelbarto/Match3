@@ -83,13 +83,7 @@ namespace PuzzleGame.Gameplay.Views
                 itemImage.sprite = currentSprite;
         }
 
-        [Button]
-        public void CrackGrid(GridViewStrategy strategy)
-        {
-            CrackGridAsync(strategy).Forget();
-        }
-
-        private async UniTask CrackGridAsync(GridViewStrategy strategy)
+        public async UniTask CrackGridAsync(GridViewStrategy strategy)
         {
             gameObject.SetActive(false);
             if (strategy != null)

@@ -4,6 +4,7 @@ using PuzzleGame.Gameplay.Components;
 using PuzzleGame.Gameplay.DataStructures;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace PuzzleGame.Gameplay.Views
 {

@@ -16,6 +16,7 @@ namespace PuzzleGame.Gameplay.Presenters
     {
         public event Action<GridModel, bool> OnGridMatched;
         public event Action<GridPresenter> OnGridDestroyed;
+        public event Action<int, bool> OnCrackAnimationStateChange;
 
         private readonly GameObjectPool<GridView> _gridViewPool;
         private readonly ViewPrefabContainer _viewPrefabContainer;
@@ -182,7 +183,7 @@ namespace PuzzleGame.Gameplay.Presenters
             }
         }
 
-        private void DestroyGrid(GridType otherEffectedType, bool playCrackAnimation)
+        private async UniTask DestroyGrid(GridType otherEffectedType, bool playCrackAnimation)
         {
             if (playCrackAnimation)
             {
@@ -209,11 +210,18 @@ namespace PuzzleGame.Gameplay.Presenters
                     default:
                         throw new ArgumentOutOfRangeException(nameof(otherEffectedType), otherEffectedType, null);
                 }
-                
-                _gridView.CrackGrid(strategy);   
+
+                await PlayCrackAnimationAsync(strategy);
             }
 
             OnGridDestroyed?.Invoke(this);
+        }
+
+        private async UniTask PlayCrackAnimationAsync(GridViewStrategy strategy)
+        {
+            OnCrackAnimationStateChange?.Invoke(_gridModel.Id, true);
+            await _gridView.CrackGridAsync(strategy);   
+            OnCrackAnimationStateChange?.Invoke(_gridModel.Id, false);
         }
 
         private void OnStateChanged()

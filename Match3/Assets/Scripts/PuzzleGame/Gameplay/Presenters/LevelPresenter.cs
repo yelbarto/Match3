@@ -1,10 +1,13 @@
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using PuzzleGame.Data.Services;
 using PuzzleGame.Gameplay.Models;
 using PuzzleGame.Gameplay.Views;
 using PuzzleGame.Player.Abstractions;
 using PuzzleGame.SceneManagement;
+using PuzzleGame.Util.UI;
 using UnityEngine;
 
 namespace PuzzleGame.Gameplay.Presenters
@@ -18,7 +21,9 @@ namespace PuzzleGame.Gameplay.Presenters
         private readonly LevelView _levelView;
         private readonly DebugView _debugView;
 
+        private readonly CancellationTokenSource _lifetimeCts = new ();
         private readonly List<GridPresenter> _gridPresenters = new();
+        private readonly List<int> _activeCrackAnimationIds = new();
         
         private LevelModel _levelModel;
 
@@ -92,6 +97,7 @@ namespace PuzzleGame.Gameplay.Presenters
             gridPresenter.SetUp(gridModel, shouldCreateAtModelLocation, _levelModel.BoardSize);
             gridPresenter.OnGridMatched += MatchGrid;
             gridPresenter.OnGridDestroyed += OnGridDestroyed;
+            gridPresenter.OnCrackAnimationStateChange += OnCrackAnimationStateChanged;
             _gridPresenters.Add(gridPresenter);
         }
 
@@ -100,6 +106,7 @@ namespace PuzzleGame.Gameplay.Presenters
             _gridPresenters.Remove(gridPresenter);
             gridPresenter.OnGridDestroyed -= OnGridDestroyed;
             gridPresenter.OnGridMatched -= MatchGrid;
+            gridPresenter.OnCrackAnimationStateChange -= OnCrackAnimationStateChanged;
             gridPresenter.Dispose();
         }
         
@@ -120,10 +127,25 @@ namespace PuzzleGame.Gameplay.Presenters
             {
                 _levelView.OnGoalFound(obstacleData.Key, obstacleData.Value);
             }
+            
             if (_levelModel.GetGoals().Count == 0)
+            {
+                await WaitForAnimationsAsync();
                 OnLevelCompleted();
+            }
             else if (_levelModel.IsLevelFailed())
+            {
+                await WaitForAnimationsAsync();
                 OnLevelFailed();
+            }
+        }
+
+        private async Task WaitForAnimationsAsync()
+        {
+            InputBlockerComponent.Instance.ChangeInteractable(true);
+            await UniTask.WaitUntil(() => _activeCrackAnimationIds.Count == 0,
+                cancellationToken: _lifetimeCts.Token);
+            InputBlockerComponent.Instance.ChangeInteractable(false);
         }
 
         private void CleanUp()
@@ -131,9 +153,20 @@ namespace PuzzleGame.Gameplay.Presenters
             foreach (var gridPresenter in _gridPresenters)
             {
                 gridPresenter.OnGridMatched -= MatchGrid;
+                gridPresenter.OnCrackAnimationStateChange -= OnCrackAnimationStateChanged;
+                gridPresenter.OnGridDestroyed -= OnGridDestroyed;
                 gridPresenter.Dispose();
             }
+            _activeCrackAnimationIds.Clear();
             _gridPresenters.Clear();
+        }
+
+        private void OnCrackAnimationStateChanged(int id, bool state)
+        {
+            if (state)
+                _activeCrackAnimationIds.Add(id);
+            else
+                _activeCrackAnimationIds.Remove(id);
         }
 
         private void OnLevelFailed()
@@ -174,6 +207,7 @@ namespace PuzzleGame.Gameplay.Presenters
             _debugView.RestartLevelAction -= ResetLevel;
             _debugView.CompleteLevelAction -= OnLevelCompleted;
             _debugView.FailLevelAction -= OnLevelFailed;
+            _lifetimeCts?.Cancel();
         }
     }
 }
