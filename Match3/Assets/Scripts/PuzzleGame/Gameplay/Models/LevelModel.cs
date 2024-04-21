@@ -110,7 +110,10 @@ namespace PuzzleGame.Gameplay.Models
             foreach (var model in _gridData)
             {
                 if (model is CubeModel cubeModel)
-                    cubeModel.SetState(GridState.Default, false);
+                {
+                    cubeModel.SetState(null, false);
+                    cubeModel.SetDefaultState();
+                }
             }
 
             CalculateInteractableGrids();
@@ -352,6 +355,7 @@ namespace PuzzleGame.Gameplay.Models
                         _gridData[x, y] = dropTile;
                         dropTile.BelowGridExplodeOffset = currentColumnDestroyedTiles
                             .First(v => v.Key.y < newY).Value;
+                        dropTile.IsMoving = true;
                         dropGridDictionary.Add(dropTile, new Vector2Int(x, y));
                         _gridData[x, newY] = null;
                         skipEmptySpace = true;
@@ -365,6 +369,7 @@ namespace PuzzleGame.Gameplay.Models
                     gridModel.CreationHeightOffset = creationHeightOffset;
                     creationHeightOffset++;
                     _gridData[x, y] = gridModel;
+                    gridModel.IsMoving = true;
                     dropGridDictionary.Add(gridModel, new Vector2Int(x, y));
                     newGrids.Add(gridModel);
                 }
@@ -433,16 +438,15 @@ namespace PuzzleGame.Gameplay.Models
                     gridList = CheckAndSetIfAdjacentGridIsTheSame(x, y, cubeModel.Color, gridList);
                     if (gridList.Count > 1)
                     {
-                        var cubeState = gridList.Count >= 5 ? GridState.Tnt :
-                            gridList.Count >= 3 ? GridState.Rocket : GridState.Interactable;
-                        foreach (var selectedGrids in gridList)
+                        var cubeList = gridList.Cast<CubeModel>().ToList();
+                        foreach (var selectedGrids in cubeList)
                         {
-                            ((CubeModel)selectedGrids).SetState(cubeState, true);
+                            selectedGrids.SetState(cubeList, true);
                         }
                     }
                     else
                     {
-                        ((CubeModel)gridModel).SetState(GridState.NonInteractable, true);
+                        ((CubeModel)gridModel).SetState(null, true);
                     }
                 }
             }

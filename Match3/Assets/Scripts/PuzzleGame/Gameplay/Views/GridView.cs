@@ -98,12 +98,7 @@ namespace PuzzleGame.Gameplay.Views
                 await _gridViewStrategy.PlayBreakAnimation(_transform, _transform.position);
         }
 
-        public void DropGrid(Vector2Int position, int belowGridExplodeOffset)
-        {
-            DropGridSpeedBaseAsync(position, belowGridExplodeOffset).Forget();
-        }
-
-        private async UniTask DropGridSpeedBaseAsync(Vector2Int position, int belowGridExplodeOffset)
+        public async UniTask DropGridSpeedBaseAsync(Vector2Int position, int belowGridExplodeOffset)
         {
             _dropCts?.Cancel();
             _dropCts = new CancellationTokenSource();
@@ -122,7 +117,9 @@ namespace PuzzleGame.Gameplay.Views
             var speed = diffY >= 6 ? diffY * 2 : diffY >= 4 ? diffY * 2.5f : diffY * 3;
             speed = Mathf.Clamp(speed, minSpeedValue, maxSpeedValue);
             _transform.DOLocalMove(GetPosition(position), speed).SetEase(dropSpeedEase)
-                .SetSpeedBased();
+                .SetSpeedBased().ToUniTask(TweenCancelBehaviour.CompleteAndCancelAwait, _dropCts.Token).Forget();
+            await UniTask.Delay(TimeSpan.FromSeconds(diffY / speed - GameplayVariables.Instance.DropAnimationFinalOffset),
+                cancellationToken: _dropCts.Token);
         }
 
         public void SetInteractable(bool interactable)

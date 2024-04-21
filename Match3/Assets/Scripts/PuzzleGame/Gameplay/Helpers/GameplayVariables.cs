@@ -11,8 +11,10 @@ namespace PuzzleGame.Gameplay.Context
         [SerializeField] private int rocketInitialExplodeDistance = 1;
         
         [SerializeField] private float explodeOffsetMultiplier = 0.03f;
+        [SerializeField] private float dropAnimationFinalOffset = 0.05f;
         
         public int CreationHeightOffset => creationHeightOffset;
+        public float DropAnimationFinalOffset => dropAnimationFinalOffset;
         public int RocketInitialExplodeDistance => rocketInitialExplodeDistance;
         public float ExplodeOffsetMultiplier => explodeOffsetMultiplier;
         public Transform BottomLeftRocketPositioner => bottomLeftRocketPositioner;

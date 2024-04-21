@@ -10,6 +10,7 @@ namespace PuzzleGame.Gameplay.Models
         private readonly BreakableModelStrategy _breakableModelStrategy;
         public GridType GridType { get; }
         public bool IsObstacle { get; protected set; }
+        public bool IsMoving { get; set; }
         public bool IsSpecialItem { get; protected set; }
         public bool IsInteractable { get; protected set; }
         public int Id { get; private set; }
@@ -39,6 +40,11 @@ namespace PuzzleGame.Gameplay.Models
         {
             SetPosition(position);
             OnDropGrid?.Invoke();
+        }
+
+        public virtual void Dropped()
+        {
+            IsMoving = false;
         }
 
         public bool MatchEffectedGrid(bool isSpecialMatch, GridType otherGridType)

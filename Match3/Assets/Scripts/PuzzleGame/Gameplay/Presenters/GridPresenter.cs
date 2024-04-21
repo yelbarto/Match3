@@ -66,76 +66,88 @@ namespace PuzzleGame.Gameplay.Presenters
 
             if (_gridType is GridType.Cube)
             {
-                var cubeView = _gridViewPool.Get();
-                var cubeModel = (CubeModel)_gridModel;
-
-                _gridView = cubeView;
-                cubeModel.OnStateChanged += OnStateChanged;
-                var cubeViewStrategy = new CubeViewStrategy(cubeModel.Color);
-                _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, cubeViewStrategy, offset,
-                    cubeModel.Color);
-                _gridView.SetSprite(_gridModel.Health, cubeModel.State);
+                CreateCubeView(position, offset);
             }
             else if (_gridModel.IsSpecialItem)
             {
-                _gridView = _gridViewPool.Get();
-                GridViewStrategy strategy;
-                switch (_gridType)
-                {
-                    case GridType.HorizontalRocket:
-                    case GridType.VerticalRocket:
-                        strategy = new RocketViewStrategy(_gridType);
-                        break;
-                    case GridType.Tnt:
-                        var verticalRocketStrategy = new RocketViewStrategy(GridType.VerticalRocket);
-                        var horizontalRocketStrategy = new RocketViewStrategy(GridType.HorizontalRocket);
-                        strategy = new TntViewStrategy(_boardBorders, verticalRocketStrategy, horizontalRocketStrategy);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-
-                _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, strategy, offset, GridColor.Default);
-                _gridView.SetSprite(_gridModel.Health, GridState.Default);
+                CreateSpecialView(position, offset);
             }
             else
             {
-                _gridView = Object.Instantiate(_viewPrefabContainer.GetGridViewPrefab(_gridType),
-                    _gridViewPool.PoolParent);
-                GridViewStrategy strategy;
-                switch (_gridType)
-                {
-                    case GridType.HorizontalRocket:
-                    case GridType.VerticalRocket:
-                        strategy = new RocketViewStrategy(_gridType);
-                        break;
-                    case GridType.Tnt:
-                        var verticalRocketStrategy = new RocketViewStrategy(GridType.VerticalRocket);
-                        var horizontalRocketStrategy = new RocketViewStrategy(GridType.HorizontalRocket);
-                        strategy = new TntViewStrategy(_boardBorders, verticalRocketStrategy, horizontalRocketStrategy);
-                        break;
-                    case GridType.Box:
-                        strategy = new ObstacleViewStrategy(_gridModel.GridType);
-                        break;
-                    case GridType.Stone:
-                        strategy = new ObstacleViewStrategy(_gridModel.GridType);
-                        break;
-                    case GridType.Vase:
-                        strategy = new ObstacleViewStrategy(_gridModel.GridType);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-                _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, strategy, offset, GridColor.Default);
-                _gridView.SetSprite(_gridModel.Health, GridState.Default);
+                CreateObstacleView(position, offset);
             }
+        }
+
+        private void CreateCubeView(Vector2Int position, int offset)
+        {
+            var cubeView = _gridViewPool.Get();
+            var cubeModel = (CubeModel)_gridModel;
+
+            _gridView = cubeView;
+            cubeModel.OnStateChanged += OnStateChanged;
+            var cubeViewStrategy = new CubeViewStrategy(cubeModel.Color);
+            _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, cubeViewStrategy, offset,
+                cubeModel.Color);
+            _gridView.SetSprite(_gridModel.Health, cubeModel.State);
+        }
+
+        private void CreateObstacleView(Vector2Int position, int offset)
+        {
+            _gridView = Object.Instantiate(_viewPrefabContainer.GetGridViewPrefab(_gridType),
+                _gridViewPool.PoolParent);
+            GridViewStrategy strategy;
+            switch (_gridType)
+            {
+                case GridType.Box:
+                    strategy = new ObstacleViewStrategy(_gridModel.GridType);
+                    break;
+                case GridType.Stone:
+                    strategy = new ObstacleViewStrategy(_gridModel.GridType);
+                    break;
+                case GridType.Vase:
+                    strategy = new ObstacleViewStrategy(_gridModel.GridType);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, strategy, offset, GridColor.Default);
+            _gridView.SetSprite(_gridModel.Health, GridState.Default);
+        }
+
+        private void CreateSpecialView(Vector2Int position, int offset)
+        {
+            _gridView = _gridViewPool.Get();
+            GridViewStrategy strategy;
+            switch (_gridType)
+            {
+                case GridType.HorizontalRocket:
+                case GridType.VerticalRocket:
+                    strategy = new RocketViewStrategy(_gridType);
+                    break;
+                case GridType.Tnt:
+                    var verticalRocketStrategy = new RocketViewStrategy(GridType.VerticalRocket);
+                    var horizontalRocketStrategy = new RocketViewStrategy(GridType.HorizontalRocket);
+                    strategy = new TntViewStrategy(_boardBorders, verticalRocketStrategy, horizontalRocketStrategy);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+
+            _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, strategy, offset, GridColor.Default);
+            _gridView.SetSprite(_gridModel.Health, GridState.Default);
         }
 
         private void OnDropGrid()
         {
-            _gridView.DropGrid(_gridModel.Position, _gridModel.BelowGridExplodeOffset);
+            OnDropGridAsync().Forget();
+        }
+
+        private async UniTask OnDropGridAsync()
+        {
+            await _gridView.DropGridSpeedBaseAsync(_gridModel.Position, _gridModel.BelowGridExplodeOffset);
+            _gridModel.Dropped();
         }
 
         private void OnMatchEffected(GridType otherEffectedType)
@@ -204,7 +216,7 @@ namespace PuzzleGame.Gameplay.Presenters
             OnGridDestroyed?.Invoke(this);
         }
 
-        public void OnStateChanged()
+        private void OnStateChanged()
         {
             ChangeGridSprite();
             _gridView.SetInteractable(_gridModel.IsInteractable);
