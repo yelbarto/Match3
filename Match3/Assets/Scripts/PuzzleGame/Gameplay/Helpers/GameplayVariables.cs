@@ -8,8 +8,13 @@ namespace PuzzleGame.Gameplay.Context
         [SerializeField] private int creationHeightOffset = 5;
         [SerializeField] private Transform bottomLeftRocketPositioner;
         [SerializeField] private Transform topRightRocketPositioner;
+        [SerializeField] private int rocketInitialExplodeDistance = 1;
+        
+        [SerializeField] private float explodeOffsetMultiplier = 0.03f;
         
         public int CreationHeightOffset => creationHeightOffset;
+        public int RocketInitialExplodeDistance => rocketInitialExplodeDistance;
+        public float ExplodeOffsetMultiplier => explodeOffsetMultiplier;
         public Transform BottomLeftRocketPositioner => bottomLeftRocketPositioner;
         public Transform TopRightRocketPositioner => topRightRocketPositioner;
         public CancellationToken LifetimeToken => _lifetimeCts.Token;

@@ -24,6 +24,11 @@ namespace PuzzleGame.Gameplay.Models
         private readonly ObstacleBreakableModelStrategy _obstacleBreakableModelStrategy;
         private readonly PlayableBreakableModelStrategy _playableBreakableModelStrategy;
 
+        private readonly Dictionary<Vector2Int, int> _destroyedGrids = new ();
+        private readonly Queue<int> _activeMatchingQueue = new();
+        
+        private bool _matchingActive;
+        private int _matchCount;
         private GridModel[,] _gridData;
         private Vector2Int _boardSize;
         private int _currentLevel;
@@ -239,10 +244,6 @@ namespace PuzzleGame.Gameplay.Models
             return MoveCount == 0;
         }
 
-        private readonly Queue<int> _activeMatchingQueue = new();
-        private bool _matchingActive;
-        private int _matchCount;
-
         public async UniTask<Dictionary<GridType, int>> MatchGrids(GridModel gridModel)
         {
             var currentMatchCount = _matchCount;
@@ -264,15 +265,18 @@ namespace PuzzleGame.Gameplay.Models
                 if (specialItem.IsUsed) return brokenObstacles;
                 var adjacentGrid = GetAdjacentStrategy(gridModel.Position);
                 var effectedGrids = specialItem.UseSpecialItem(adjacentGrid?.UseAsCombinedSpecialItem());
-                foreach (var gridPosition in effectedGrids)
+                foreach (var gridPositionPair in effectedGrids)
                 {
+                    var gridPosition = gridPositionPair.Key;
                     var effectedGrid = _gridData[gridPosition.x, gridPosition.y];
                     if (effectedGrid is null) continue;
-                    GridType otherGridType = GridType.Default;
+                    var otherGridType = GridType.Default;
                     if (effectedGrid == gridModel && adjacentGrid != null)
                         otherGridType = adjacentGrid.GridType;
+                    effectedGrid.ExplodeOffset = gridPositionPair.Value + specialItem.ExplodeOffset;
                     if (!effectedGrid.MatchEffectedGrid(true, otherGridType)) continue;
                     _gridData[effectedGrid.Position.x, effectedGrid.Position.y] = null;
+                    _destroyedGrids.Add(gridPosition, effectedGrid.ExplodeOffset);
                     if (!effectedGrid.IsObstacle) continue;
                     if (!brokenObstacles.TryAdd(effectedGrid.GridType, 1))
                     {
@@ -292,12 +296,14 @@ namespace PuzzleGame.Gameplay.Models
                 {
                     cube.MatchEffectedGrid(false, GridType.Default);
                     _gridData[cube.Position.x, cube.Position.y] = null;
+                    _destroyedGrids.Add(cube.Position, cube.ExplodeOffset);
                 }
 
                 foreach (var obstacleModel in obstacleList)
                 {
                     var isDestroyed = obstacleModel.MatchEffectedGrid(false, GridType.Default);
                     if (!isDestroyed) continue;
+                    _destroyedGrids.Add(obstacleModel.Position, obstacleModel.ExplodeOffset);
                     _gridData[obstacleModel.Position.x, obstacleModel.Position.y] = null;
                     if (!brokenObstacles.TryAdd(obstacleModel.GridType, 1))
                     {
@@ -310,7 +316,10 @@ namespace PuzzleGame.Gameplay.Models
             }
             
             if (_activeMatchingQueue.Count == 0)
+            {
                 DropAndCreateGrids(createdSpecialItem);
+                _destroyedGrids.Clear();
+            }
             _matchingActive = false;
             return brokenObstacles;
         }
@@ -322,11 +331,15 @@ namespace PuzzleGame.Gameplay.Models
             for (var x = 0; x < _boardSize.x; x++)
             {
                 var creationHeightOffset = 0;
+                var currentColumnDestroyedTiles = _destroyedGrids
+                    .Where(g => g.Key.x == x)
+                    .OrderByDescending(g => g.Key.y)
+                    .ToDictionary(g => g.Key, g => g.Value);
                 for (var y = 0; y < _boardSize.y; y++)
                 {
                     if (_gridData[x, y] != null) continue;
                     var skipEmptySpace = false;
-                    for (var newY = y; newY < _boardSize.y; newY++)
+                    for (var newY = y+1; newY < _boardSize.y; newY++)
                     {
                         if (_gridData[x, newY] == null) continue;
                         var dropTile = _gridData[x, newY];
@@ -337,6 +350,8 @@ namespace PuzzleGame.Gameplay.Models
                             break;
                         }
                         _gridData[x, y] = dropTile;
+                        dropTile.BelowGridExplodeOffset = currentColumnDestroyedTiles
+                            .First(v => v.Key.y < newY).Value;
                         dropGridDictionary.Add(dropTile, new Vector2Int(x, y));
                         _gridData[x, newY] = null;
                         skipEmptySpace = true;
@@ -344,6 +359,7 @@ namespace PuzzleGame.Gameplay.Models
                     }
                     if (skipEmptySpace) continue;
                     var gridModel = CreateGridModel("rand");
+                    gridModel.BelowGridExplodeOffset = currentColumnDestroyedTiles.First().Value;
                     gridModel.SetPosition(new Vector2Int(x, y));
 
                     gridModel.CreationHeightOffset = creationHeightOffset;
@@ -353,46 +369,8 @@ namespace PuzzleGame.Gameplay.Models
                     newGrids.Add(gridModel);
                 }
             }
-            // for (var y = 0; y < _boardSize.y; y++)
-            // {
-            //     for (var x = 0; x < _boardSize.x; x++)
-            //     {
-            //         if (_gridData[x, y] != null) continue;
-            //         var skipEmptySpace = false;
-            //         for (var newY = y; newY < _boardSize.y; newY++)
-            //         {
-            //             if (_gridData[x, newY] == null) continue;
-            //             var dropTile = _gridData[x, newY];
-            //             if (!dropTile.CanFall())
-            //             {
-            //                 skipEmptySpace = true;
-            //                 break;
-            //             }
-            //             _gridData[x, y] = dropTile;
-            //             dropGridDictionary.Add(dropTile, new Vector2Int(x, y));
-            //             _gridData[x, newY] = null;
-            //             skipEmptySpace = true;
-            //             break;
-            //         }
-            //
-            //         if (skipEmptySpace) continue;
-            //         var gridModel = CreateGridModel("rand");
-            //         gridModel.SetPosition(new Vector2Int(x, y));
-            //         var offset = 0;
-            //         for (var newY = y; newY < _boardSize.y; newY++)
-            //         {
-            //             offset++;
-            //         }
-            //
-            //         gridModel.CreationHeightOffset = offset;
-            //         _gridData[x, y] = gridModel;
-            //         dropGridDictionary.Add(gridModel, new Vector2Int(x, y));
-            //         newGrids.Add(gridModel);
-            //     }
-            // }
             CalculateGridsAfterMatch();
             OnNewGridsCreated?.Invoke(newGrids, false);
-            createdSpecialItem?.DropGrid(createdSpecialItem.Position);
             foreach (var gridPair in dropGridDictionary)
             {
                 gridPair.Key.DropGrid(gridPair.Value);

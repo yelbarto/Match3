@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using PuzzleGame.Gameplay.Context;
 using PuzzleGame.Gameplay.DataStructures;
@@ -18,6 +19,7 @@ namespace PuzzleGame.Gameplay.Presenters
 
         private readonly GameObjectPool<GridView> _gridViewPool;
         private readonly ViewPrefabContainer _viewPrefabContainer;
+        private readonly CancellationTokenSource _lifetimeCts;
 
         private GridView _gridView;
         private GridType _gridType;
@@ -28,6 +30,7 @@ namespace PuzzleGame.Gameplay.Presenters
         {
             _gridViewPool = gridViewPool;
             _viewPrefabContainer = viewPrefabContainer;
+            _lifetimeCts = new CancellationTokenSource();
         }
 
         public void SetUp(GridModel gridModel, bool shouldCreateAtModelLocation, Vector2Int boardBorders)
@@ -132,7 +135,7 @@ namespace PuzzleGame.Gameplay.Presenters
 
         private void OnDropGrid()
         {
-            _gridView.DropGrid(_gridModel.Position);
+            _gridView.DropGrid(_gridModel.Position, _gridModel.BelowGridExplodeOffset);
         }
 
         private void OnMatchEffected(GridType otherEffectedType)
@@ -144,43 +147,61 @@ namespace PuzzleGame.Gameplay.Presenters
                     OnGridMatched?.Invoke(_gridModel, false);
                 playCrackAnimation = !specialItemModel.UsedInCombination;
             }
+            
+            PlayAfterMatchGridEffects(otherEffectedType, playCrackAnimation).Forget();
+        }
 
+        private async UniTask PlayAfterMatchGridEffects(GridType otherEffectedType, bool playCrackAnimation)
+        {
+            if (playCrackAnimation)
+            {
+                _gridView.SetInteractable(false);
+                await UniTask.Delay(
+                    TimeSpan.FromSeconds(GameplayVariables.Instance.ExplodeOffsetMultiplier * _gridModel.ExplodeOffset), 
+                    cancellationToken: _lifetimeCts.Token);
+            }
             if (_gridModel.Health == 0)
             {
-                if (playCrackAnimation)
-                {
-                    GridViewStrategy strategy = null;
-                    switch (otherEffectedType)
-                    {
-                        case GridType.Default:
-                        case GridType.Cube:
-                        case GridType.Vase:
-                        case GridType.Stone:
-                        case GridType.Box:
-                            break;
-                        case GridType.VerticalRocket:
-                        case GridType.HorizontalRocket:
-                            strategy = _gridType is GridType.VerticalRocket
-                                ? new RocketViewStrategy(GridType.HorizontalRocket)
-                                : new RocketViewStrategy(GridType.VerticalRocket);
-                            break;
-                        case GridType.Tnt:
-                            strategy = new TntViewStrategy(_boardBorders,
-                                new RocketViewStrategy(GridType.VerticalRocket),
-                                new RocketViewStrategy(GridType.HorizontalRocket));
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(otherEffectedType), otherEffectedType, null);
-                    }
-
-                    _gridView.CrackGrid(strategy);   
-                }
-                OnGridDestroyed?.Invoke(this);
+                DestroyGrid(otherEffectedType, playCrackAnimation);
             }
             else
             {
                 ChangeGridSprite();
             }
+        }
+
+        private void DestroyGrid(GridType otherEffectedType, bool playCrackAnimation)
+        {
+            if (playCrackAnimation)
+            {
+                GridViewStrategy strategy = null;
+                switch (otherEffectedType)
+                {
+                    case GridType.Default:
+                    case GridType.Cube:
+                    case GridType.Vase:
+                    case GridType.Stone:
+                    case GridType.Box:
+                        break;
+                    case GridType.VerticalRocket:
+                    case GridType.HorizontalRocket:
+                        strategy = _gridType is GridType.VerticalRocket
+                            ? new RocketViewStrategy(GridType.HorizontalRocket)
+                            : new RocketViewStrategy(GridType.VerticalRocket);
+                        break;
+                    case GridType.Tnt:
+                        strategy = new TntViewStrategy(_boardBorders,
+                            new RocketViewStrategy(GridType.VerticalRocket),
+                            new RocketViewStrategy(GridType.HorizontalRocket));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(otherEffectedType), otherEffectedType, null);
+                }
+                
+                _gridView.CrackGrid(strategy);   
+            }
+
+            OnGridDestroyed?.Invoke(this);
         }
 
         public void OnStateChanged()
@@ -205,6 +226,7 @@ namespace PuzzleGame.Gameplay.Presenters
             else
                 Object.Destroy(_gridView.gameObject);
             _gridView = null;
+            _lifetimeCts?.Cancel();
         }
     }
 }

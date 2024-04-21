@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using PuzzleGame.Gameplay.Context;
 using PuzzleGame.Gameplay.DataStructures;
 using PuzzleGame.Gameplay.Helpers;
 using PuzzleGame.Gameplay.Views.Strategy;
@@ -9,14 +10,16 @@ using PuzzleGame.Util;
 using PuzzleGame.Util.Pool;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace PuzzleGame.Gameplay.Views
 {
     public class GridView : MonoBehaviour, IPoolable
     {
         private const string DROP = "Drop Parameters";
+        private const string EXPLODE = "Explode Parameters";
         private const string REF = "References";
-        
+
         [SerializeField, FoldoutGroup(REF)] private SpriteRenderer itemImage;
         [SerializeField, FoldoutGroup(REF)] private GameObjectInputComponent inputComponent;
 
@@ -24,8 +27,8 @@ namespace PuzzleGame.Gameplay.Views
         [SerializeField, FoldoutGroup(DROP)] private AnimationCurve dropSpeedEase;
         [SerializeField, FoldoutGroup(DROP)] private float minSpeedValue = 3f;
         [SerializeField, FoldoutGroup(DROP)] private float maxSpeedValue = 20f;
-        [SerializeField, FoldoutGroup(DROP)] private float dropOffsetAmount = 0.03f;
-        
+        [SerializeField, FoldoutGroup(DROP)] private float dropOffsetMultiplier = 0.03f;
+
 
         public event Action OnGridClicked;
 
@@ -67,7 +70,7 @@ namespace PuzzleGame.Gameplay.Views
         {
             return new Vector3(position.x, position.y, -position.y / 10f);
         }
-        
+
         private void SetPosition(Vector2Int position)
         {
             _transform.localPosition = GetPosition(position);
@@ -95,21 +98,25 @@ namespace PuzzleGame.Gameplay.Views
                 await _gridViewStrategy.PlayBreakAnimation(_transform, _transform.position);
         }
 
-        public void DropGrid(Vector2Int position)
+        public void DropGrid(Vector2Int position, int belowGridExplodeOffset)
         {
-            DropGridSpeedBaseAsync(position).Forget();
+            DropGridSpeedBaseAsync(position, belowGridExplodeOffset).Forget();
         }
 
-        private async UniTask DropGridSpeedBaseAsync(Vector2Int position)
+        private async UniTask DropGridSpeedBaseAsync(Vector2Int position, int belowGridExplodeOffset)
         {
             _dropCts?.Cancel();
             _dropCts = new CancellationTokenSource();
+            await UniTask.Delay(
+                TimeSpan.FromSeconds(GameplayVariables.Instance.ExplodeOffsetMultiplier * belowGridExplodeOffset), 
+                cancellationToken: _lifetimeCts.Token);
             if (_currentDropOffset != 0)
             {
-                await UniTask.Delay(TimeSpan.FromSeconds(dropOffsetAmount * _currentDropOffset),
+                await UniTask.Delay(TimeSpan.FromSeconds(dropOffsetMultiplier * _currentDropOffset),
                     cancellationToken: _dropCts.Token);
                 _currentDropOffset = 0;
             }
+
             _transform.DOKill();
             var diffY = _transform.localPosition.y - position.y;
             var speed = diffY >= 6 ? diffY * 2 : diffY >= 4 ? diffY * 2.5f : diffY * 3;

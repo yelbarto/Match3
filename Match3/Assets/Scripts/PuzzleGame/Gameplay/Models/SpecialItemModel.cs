@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using PuzzleGame.Gameplay.DataStructures;
 using PuzzleGame.Gameplay.Models.Strategy;
 using UnityEngine;
@@ -27,7 +28,7 @@ namespace PuzzleGame.Gameplay.Models
             return _strategy;
         }
 
-        public Vector2Int[] UseSpecialItem(SpecialItemModelStrategy otherSpecialItemModeStrategy)
+        public Dictionary<Vector2Int, int> UseSpecialItem(SpecialItemModelStrategy otherSpecialItemModeStrategy)
         {
             IsUsed = true;
             return otherSpecialItemModeStrategy == null

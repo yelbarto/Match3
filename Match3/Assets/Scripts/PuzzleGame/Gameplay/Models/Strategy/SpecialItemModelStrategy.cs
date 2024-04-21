@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace PuzzleGame.Gameplay.Models.Strategy
@@ -11,8 +12,8 @@ namespace PuzzleGame.Gameplay.Models.Strategy
             Borders = borders;
         }
         
-        public abstract Vector2Int[] UseSpecialItem(Vector2Int position);
-        public abstract Vector2Int[] UseCombinedSpecialItem(Vector2Int position, 
+        public abstract Dictionary<Vector2Int, int> UseSpecialItem(Vector2Int position);
+        public abstract Dictionary<Vector2Int, int> UseCombinedSpecialItem(Vector2Int position, 
             SpecialItemModelStrategy otherSpecialItemModelStrategy);
     }
 }

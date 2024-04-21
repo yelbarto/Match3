@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using PuzzleGame.Gameplay.Context;
 using PuzzleGame.Gameplay.DataStructures;
 using UnityEngine;
 
@@ -13,33 +15,32 @@ namespace PuzzleGame.Gameplay.Models.Strategy
         {
             _direction = direction;
         }
-        
-        public override Vector2Int[] UseSpecialItem(Vector2Int position)
+
+        public override Dictionary<Vector2Int, int> UseSpecialItem(Vector2Int position)
         {
             return UseRocket(position, _direction);
         }
 
-        private Vector2Int[] UseRocket(Vector2Int position, Direction direction)
+        private Dictionary<Vector2Int, int> UseRocket(Vector2Int position, Direction direction)
         {
-            var index = 0;
-            Vector2Int[] effectedPositions;
+            var effectedPositions = new Dictionary<Vector2Int, int>();
             switch (direction)
             {
                 case Direction.Vertical:
-                    effectedPositions = new Vector2Int[Borders.y];
                     for (var y = 0; y < Borders.y; y++)
                     {
-                        effectedPositions[index] = new Vector2Int(position.x, y);
-                        index++;
+                        effectedPositions.Add(new Vector2Int(position.x, y),
+                            Mathf.Max(0,
+                                Math.Abs(position.y - y) - GameplayVariables.Instance.RocketInitialExplodeDistance));
                     }
 
                     return effectedPositions;
                 case Direction.Horizontal:
-                    effectedPositions = new Vector2Int[Borders.x];
                     for (var x = 0; x < Borders.x; x++)
                     {
-                        effectedPositions[index] = new Vector2Int(x, position.y);
-                        index++;
+                        effectedPositions.Add(new Vector2Int(x, position.y),
+                            Mathf.Max(0,
+                                Math.Abs(position.x - x) - GameplayVariables.Instance.RocketInitialExplodeDistance));
                     }
 
                     return effectedPositions;
@@ -48,20 +49,22 @@ namespace PuzzleGame.Gameplay.Models.Strategy
             }
         }
 
-        public override Vector2Int[] UseCombinedSpecialItem(Vector2Int position,
+        public override Dictionary<Vector2Int, int> UseCombinedSpecialItem(Vector2Int position,
             SpecialItemModelStrategy otherSpecialItemModelStrategy)
         {
-            return otherSpecialItemModelStrategy.GetType() == GetType() 
-                ? UseRocketCombination(position) 
+            return otherSpecialItemModelStrategy.GetType() == GetType()
+                ? UseRocketCombination(position)
                 : otherSpecialItemModelStrategy.UseCombinedSpecialItem(position, this);
         }
 
-        private Vector2Int[] UseRocketCombination(Vector2Int position)
+        private Dictionary<Vector2Int, int> UseRocketCombination(Vector2Int position)
         {
-            var effectedPositions = UseRocket(position, Direction.Horizontal).ToList();
-            effectedPositions.AddRange(UseRocket(position, Direction.Vertical));
-            effectedPositions.Remove(position);
-            return effectedPositions.ToArray();
+            var effectedPositions = UseRocket(position, Direction.Horizontal);
+            var verticalRocketEffectedPositions = UseRocket(position, Direction.Vertical);
+            verticalRocketEffectedPositions.Remove(position);
+            effectedPositions = effectedPositions.Concat(verticalRocketEffectedPositions)
+                .ToDictionary(e => e.Key, e => e.Value);
+            return effectedPositions;
         }
     }
 }
