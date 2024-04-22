@@ -1,0 +1,114 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: GridItemSpriteAtlas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 1
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 102900000, guid: 9380c9717214d4317b45d2fecba64f14, type: 3}
+    - {fileID: 102900000, guid: 9bd56a92313f54171a4d010faca598fd, type: 3}
+    - {fileID: 102900000, guid: ace5d8139f7ba48d4837efe830b22cc9, type: 3}
+    - {fileID: 102900000, guid: b5ce5956a14004d2c967c8b36da372f1, type: 3}
+    - {fileID: 102900000, guid: d349461e62f504e9ba7c44fb955815fc, type: 3}
+    - {fileID: 102900000, guid: 325308bc2ae5a4a70ba17706171b02c9, type: 3}
+    - {fileID: 21300000, guid: f226178993da1427e88b32ecf2d5a6bb, type: 3}
+    - {fileID: 21300000, guid: 3039d55317c0e43e887245b88af76aee, type: 3}
+    - {fileID: 21300000, guid: 4bf54e209896a47ef978fa6a9ecd0346, type: 3}
+    - {fileID: 21300000, guid: 911d95d11fe074cbcb5c1b994ef2f02f, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - 4bf54e209896a47ef978fa6a9ecd0346: 21300000
+    - 673825c09ef1d4789a86caa938371873: 21300000
+    - 911d95d11fe074cbcb5c1b994ef2f02f: 21300000
+    - 669d2ce241dd14be4a839880455a6ba5: 21300000
+    - fb6d091340f7e40f6987c46d989adf88: 21300000
+    - 9fb3e7235c37f44e0a7ffabf3ccb382e: 21300000
+    - 3039d55317c0e43e887245b88af76aee: 21300000
+    - 5da24f15bb0c64aac9c0d077f5688861: 21300000
+    - 138d6ae7164754a0481e8c92b864fd01: 21300000
+    - 4d045b08774a64c11ba547bcaa8fb547: 21300000
+    - aca78c6853f6a442cb37ef83b9c40e3a: 21300000
+    - 91fea898e3aef483dbd4c6bd2de8fbb6: 21300000
+    - b9d6c709375ba4b73b7d3176487c96e5: 21300000
+    - f226178993da1427e88b32ecf2d5a6bb: 21300000
+    - c8896b2ae7752437abce6b032616f96c: 21300000
+    - 57315e3a5b8334582909dd54c4117776: 21300000
+    - f224443c23f364fe59ec67f36955e46c: 21300000
+    - 01d666ec5fc2a4517bd1cef829cd1166: 21300000
+    - d9dd941d63d2749eab45521bd179f70b: 21300000
+    - 0650b7adf39c64e188fe2317992283a7: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 4bf54e209896a47ef978fa6a9ecd0346, type: 3}
+  - {fileID: 21300000, guid: 673825c09ef1d4789a86caa938371873, type: 3}
+  - {fileID: 21300000, guid: 911d95d11fe074cbcb5c1b994ef2f02f, type: 3}
+  - {fileID: 21300000, guid: 669d2ce241dd14be4a839880455a6ba5, type: 3}
+  - {fileID: 21300000, guid: fb6d091340f7e40f6987c46d989adf88, type: 3}
+  - {fileID: 21300000, guid: 9fb3e7235c37f44e0a7ffabf3ccb382e, type: 3}
+  - {fileID: 21300000, guid: 3039d55317c0e43e887245b88af76aee, type: 3}
+  - {fileID: 21300000, guid: 5da24f15bb0c64aac9c0d077f5688861, type: 3}
+  - {fileID: 21300000, guid: 138d6ae7164754a0481e8c92b864fd01, type: 3}
+  - {fileID: 21300000, guid: 4d045b08774a64c11ba547bcaa8fb547, type: 3}
+  - {fileID: 21300000, guid: aca78c6853f6a442cb37ef83b9c40e3a, type: 3}
+  - {fileID: 21300000, guid: 91fea898e3aef483dbd4c6bd2de8fbb6, type: 3}
+  - {fileID: 21300000, guid: b9d6c709375ba4b73b7d3176487c96e5, type: 3}
+  - {fileID: 21300000, guid: f226178993da1427e88b32ecf2d5a6bb, type: 3}
+  - {fileID: 21300000, guid: c8896b2ae7752437abce6b032616f96c, type: 3}
+  - {fileID: 21300000, guid: 57315e3a5b8334582909dd54c4117776, type: 3}
+  - {fileID: 21300000, guid: f224443c23f364fe59ec67f36955e46c, type: 3}
+  - {fileID: 21300000, guid: 01d666ec5fc2a4517bd1cef829cd1166, type: 3}
+  - {fileID: 21300000, guid: d9dd941d63d2749eab45521bd179f70b, type: 3}
+  - {fileID: 21300000, guid: 0650b7adf39c64e188fe2317992283a7, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - TNT
+  - red_tnt
+  - grid_background
+  - yellow_rocket
+  - stone
+  - green
+  - vertical_rocket
+  - vase_01
+  - vase_02
+  - box
+  - yellow
+  - red_rocket
+  - green_rocket
+  - horizontal_rocket
+  - yellow_tnt
+  - blue_tnt
+  - blue
+  - red
+  - blue_rocket
+  - green_tnt
+  m_RenderDataMap: {}
+  m_Tag: GridItemSpriteAtlas
+  m_IsVariant: 0
