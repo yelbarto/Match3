@@ -83,9 +83,10 @@ namespace PuzzleGame.Gameplay.Views
                 itemImage.sprite = currentSprite;
         }
 
-        public async UniTask CrackGridAsync(GridViewStrategy strategy)
+        public async UniTask CrackGridAsync(GridViewStrategy strategy, bool isCompletelyCracked)
         {
-            gameObject.SetActive(false);
+            if (isCompletelyCracked)
+                gameObject.SetActive(false);
             if (strategy != null)
                 await _gridViewStrategy.PlaySuperBreakAnimation(_transform, _transform.position, strategy);
             else

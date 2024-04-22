@@ -172,9 +172,15 @@ namespace PuzzleGame.Gameplay.Presenters
         private void OnCrackAnimationStateChanged(int id, bool state)
         {
             if (state)
+            {
+                if (_activeCrackAnimationIds.Contains(id)) return;
                 _activeCrackAnimationIds.Add(id);
+            }
             else
+            {
+                if (!_activeCrackAnimationIds.Contains(id)) return;
                 _activeCrackAnimationIds.Remove(id);
+            }
         }
 
         private void OnLevelFailed()

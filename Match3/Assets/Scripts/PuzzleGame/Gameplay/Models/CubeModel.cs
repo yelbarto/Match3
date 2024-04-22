@@ -13,7 +13,7 @@ namespace PuzzleGame.Gameplay.Models
         public GridState State { get; private set; }
         public event Action OnStateChanged;
 
-        public CubeModel(GridColor color, int id, PlayableBreakableModelStrategy strategy) : base(GridType.Cube, id, 
+        public CubeModel(GridColor color, int id, PlayableBreakableModelStrategy strategy) : base(GridType.Cube, id,
             strategy, 1)
         {
             Color = color;
@@ -37,7 +37,9 @@ namespace PuzzleGame.Gameplay.Models
         private void OnAdjacentCubesUpdated(bool shouldInvokeCallbacks)
         {
             var count = _adjacentCubes?.Count(c => !c.IsMoving) ?? 0;
-            var state = count >= 5 ? GridState.Tnt : count >= 3 ? GridState.Rocket : GridState.Interactable;
+            var state = count >= 5 ? GridState.Tnt :
+                count >= 3 ? GridState.Rocket : 
+                count == 2 ? GridState.Interactable : GridState.NonInteractable;
             State = state;
             IsInteractable = state != GridState.NonInteractable;
             if (shouldInvokeCallbacks)
@@ -48,7 +50,7 @@ namespace PuzzleGame.Gameplay.Models
         {
             State = GridState.Default;
         }
-        
+
         public void SetState(List<CubeModel> adjacentCubes, bool shouldInvokeCallbacks)
         {
             _adjacentCubes = adjacentCubes;
