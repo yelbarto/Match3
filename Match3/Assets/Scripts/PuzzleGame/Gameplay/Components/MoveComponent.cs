@@ -14,9 +14,9 @@ namespace PuzzleGame.Gameplay.Components
             moveText.text = moveCount.ToString();
         }
 
-        public void OnMoveHappened()
+        public void OnMoveHappened(int spentMoveCount)
         {
-            _currentMoveCount--;
+            _currentMoveCount -= spentMoveCount;
             moveText.text = _currentMoveCount.ToString();
         }
     }

@@ -237,9 +237,9 @@ namespace PuzzleGame.Gameplay.Models
             return (cubeModels, adjacentObstacles);
         }
 
-        public void SpendMove()
+        public void SpendMove(int spentMoveCount)
         {
-            MoveCount--;
+            MoveCount -= spentMoveCount;
         }
         
         public bool IsLevelFailed()

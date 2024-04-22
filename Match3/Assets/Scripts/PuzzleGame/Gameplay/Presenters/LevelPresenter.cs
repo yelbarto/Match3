@@ -43,9 +43,17 @@ namespace PuzzleGame.Gameplay.Presenters
         {
             _levelView.DebugSetCubeStateAction += DebugSetCubeState;
             _debugView.ChangeLevelAction += ChangeLevel;
+            _debugView.SpendMoveAction += SpendMove;
             _debugView.RestartLevelAction += ResetLevel;
             _debugView.CompleteLevelAction += OnLevelCompleted;
             _debugView.FailLevelAction += OnLevelFailed;
+        }
+
+        private void SpendMove(int move)
+        {
+            var toSpendMove = Mathf.Min(move, _levelModel.MoveCount - 1);
+            _levelModel.SpendMove(toSpendMove);
+            _levelView.OnMoveHappened(toSpendMove);
         }
 
         private void ChangeLevel(int level)
@@ -119,8 +127,8 @@ namespace PuzzleGame.Gameplay.Presenters
         {
             if (isMove)
             {
-                _levelModel.SpendMove();
-                _levelView.OnMoveHappened();
+                _levelModel.SpendMove(1);
+                _levelView.OnMoveHappened(1);
             }
             var brokenObstacles = await _levelModel.MatchGrids(gridModel);
             foreach (var obstacleData in brokenObstacles)
@@ -207,6 +215,7 @@ namespace PuzzleGame.Gameplay.Presenters
             _debugView.RestartLevelAction -= ResetLevel;
             _debugView.CompleteLevelAction -= OnLevelCompleted;
             _debugView.FailLevelAction -= OnLevelFailed;
+            _debugView.SpendMoveAction -= SpendMove;
             _lifetimeCts?.Cancel();
         }
     }

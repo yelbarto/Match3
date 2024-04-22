@@ -168,6 +168,7 @@ namespace PuzzleGame.Gameplay.Presenters
         {
             if (playCrackAnimation)
             {
+                OnCrackAnimationStateChange?.Invoke(_gridModel.Id, true);
                 _gridView.SetInteractable(false);
                 await UniTask.Delay(
                     TimeSpan.FromSeconds(GameplayVariables.Instance.ExplodeOffsetMultiplier * _gridModel.ExplodeOffset), 
@@ -175,7 +176,7 @@ namespace PuzzleGame.Gameplay.Presenters
             }
             if (_gridModel.Health == 0)
             {
-                DestroyGrid(otherEffectedType, playCrackAnimation);
+                DestroyGrid(otherEffectedType, playCrackAnimation).Forget();
             }
             else
             {
@@ -219,7 +220,6 @@ namespace PuzzleGame.Gameplay.Presenters
 
         private async UniTask PlayCrackAnimationAsync(GridViewStrategy strategy)
         {
-            OnCrackAnimationStateChange?.Invoke(_gridModel.Id, true);
             await _gridView.CrackGridAsync(strategy);   
             OnCrackAnimationStateChange?.Invoke(_gridModel.Id, false);
         }

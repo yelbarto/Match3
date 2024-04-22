@@ -40,9 +40,9 @@ namespace PuzzleGame.Gameplay.Views
             goalsComponent.OnGoalFound(goalType, foundGoalCount);
         }
         
-        public void OnMoveHappened()
+        public void OnMoveHappened(int spentMoveCount)
         {
-            moveComponent.OnMoveHappened();
+            moveComponent.OnMoveHappened(spentMoveCount);
         }
         
         public void OnLevelCompleted(Action closeAction)

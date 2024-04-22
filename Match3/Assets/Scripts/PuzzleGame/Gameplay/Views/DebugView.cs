@@ -13,9 +13,12 @@ namespace PuzzleGame.Gameplay.Views
         [SerializeField] private Button restartLevelButton;
         [SerializeField] private Button completeLevelButton;
         [SerializeField] private Button failLevelButton;
+        [SerializeField] private Button spendMoveButton;
         [SerializeField] private TMP_InputField levelInputField;
+        [SerializeField] private TMP_InputField spendMoveInputField;
         
         [NonSerialized] public Action<int> ChangeLevelAction;
+        [NonSerialized] public Action<int> SpendMoveAction;
         [NonSerialized] public Action RestartLevelAction;
         [NonSerialized] public Action CompleteLevelAction;
         [NonSerialized] public Action FailLevelAction;
@@ -40,6 +43,7 @@ namespace PuzzleGame.Gameplay.Views
                 FailLevelAction?.Invoke();
                 debugPanel.SetActive(false);
             });
+            spendMoveButton.onClick.AddListener(SpendMove);
         }
 
         private void ChangeLevel()
@@ -53,6 +57,17 @@ namespace PuzzleGame.Gameplay.Views
             Debug.LogError("Could not parse level input field! " + levelInputField.text);
         }
 
+        private void SpendMove()
+        {
+            if (int.TryParse(spendMoveInputField.text, out var move))
+            {
+                SpendMoveAction?.Invoke(move);
+                debugPanel.SetActive(false);
+                return;
+            }
+            Debug.LogError("Could not parse move input field! " + spendMoveInputField.text);
+        }
+
         private void OnDestroy()
         {
             debugButton.onClick.RemoveAllListeners();
@@ -60,6 +75,7 @@ namespace PuzzleGame.Gameplay.Views
             restartLevelButton.onClick.RemoveAllListeners();
             completeLevelButton.onClick.RemoveAllListeners();
             failLevelButton.onClick.RemoveAllListeners();
+            spendMoveButton.onClick.RemoveAllListeners();
         }
     }
 }
