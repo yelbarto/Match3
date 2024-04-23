@@ -15,7 +15,7 @@ namespace PuzzleGame.Gameplay.Models
         public bool IsInteractable { get; protected set; }
         public int Id { get; private set; }
         public int Health { get; private set; }
-        public int CreationHeightOffset { get; set; }
+        public int DropHeightOffset { get; set; }
         public int ExplodeOffset { get; set; }
         public int BelowGridExplodeOffset { get; set; }
         public Vector2Int Position { get; private set; }

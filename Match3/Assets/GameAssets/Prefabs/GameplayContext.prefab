@@ -27,13 +27,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2801047593560312232}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2801047593560312230
 MonoBehaviour:
@@ -125,6 +125,9 @@ MonoBehaviour:
   rocketInitialExplodeDistance: 1
   explodeOffsetMultiplier: 0.05
   dropAnimationFinalOffset: 0.15
+  cubeScaleDownDuration: 0.2
+  cubeScaleDownWaitDuration: 0.15
+  cubeScaleDownEase: 9
 --- !u!114 &2279413529644546745
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -140,19 +143,19 @@ MonoBehaviour:
   gridParticleDataList:
   - gridType: 0
     gridColor: 0
-    particleSystem: {fileID: 1047711470246948717, guid: 2b591c044a6e040acb0549f0ae2b7e45, type: 3}
+    particleSystem: {fileID: 1761255135649161332, guid: 7860d176b16d84e2eb7238dce63fa6a1, type: 3}
     warmUpAmount: 10
   - gridType: 0
     gridColor: 1
-    particleSystem: {fileID: 1047711470246948717, guid: b1c2b2091923e454792b4e7b1707509d, type: 3}
+    particleSystem: {fileID: 1761255135649161332, guid: 434b89c6529fc43c99619729f5d7ab28, type: 3}
     warmUpAmount: 10
   - gridType: 0
     gridColor: 2
-    particleSystem: {fileID: 1047711470246948717, guid: 78a20a5b3ed464c779891ee6f08ca02d, type: 3}
+    particleSystem: {fileID: 1761255135649161332, guid: 463881c1f33414befa06be601bde84df, type: 3}
     warmUpAmount: 10
   - gridType: 0
     gridColor: 3
-    particleSystem: {fileID: 1047711470246948717, guid: f56474ceb01354c2fb9faa6c4a3f0307, type: 3}
+    particleSystem: {fileID: 1761255135649161332, guid: 17f32dd9a037e480da76068c75b43d3f, type: 3}
     warmUpAmount: 10
   - gridType: 1
     gridColor: -1

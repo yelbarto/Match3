@@ -261,7 +261,6 @@ namespace PuzzleGame.Gameplay.Models
             _matchingActive = true;
             _activeMatchingQueue.Dequeue();
             var brokenObstacles = new Dictionary<GridType, int>();
-            GridModel createdSpecialItem = null;
             if (gridModel.IsSpecialItem)
             {
                 var specialItem = (SpecialItemModel)gridModel;
@@ -313,34 +312,38 @@ namespace PuzzleGame.Gameplay.Models
                         brokenObstacles[obstacleModel.GridType]++;
                     }
                 }
-                createdSpecialItem = CreateSpecialItem(gridModel);
+                var createdSpecialItem = CreateSpecialItem(gridModel);
                 if (createdSpecialItem != null)
                     OnNewGridsCreated?.Invoke(new List<GridModel> {createdSpecialItem}, true);
             }
             
             if (_activeMatchingQueue.Count == 0)
             {
-                DropAndCreateGrids(createdSpecialItem);
+                DropAndCreateGrids();
                 _destroyedGrids.Clear();
             }
             _matchingActive = false;
             return brokenObstacles;
         }
 
-        private void DropAndCreateGrids(GridModel createdSpecialItem)
+        private void DropAndCreateGrids()
         {
             var newGrids = new List<GridModel>();
             var dropGridDictionary = new Dictionary<GridModel, Vector2Int>();
             for (var x = 0; x < _boardSize.x; x++)
             {
-                var creationHeightOffset = 0;
+                var dropHeightOffset = 0;
                 var currentColumnDestroyedTiles = _destroyedGrids
                     .Where(g => g.Key.x == x)
                     .OrderByDescending(g => g.Key.y)
                     .ToDictionary(g => g.Key, g => g.Value);
                 for (var y = 0; y < _boardSize.y; y++)
                 {
-                    if (_gridData[x, y] != null) continue;
+                    if (_gridData[x, y] != null)
+                    {
+                        dropHeightOffset = 0;
+                        continue;
+                    }
                     var skipEmptySpace = false;
                     for (var newY = y+1; newY < _boardSize.y; newY++)
                     {
@@ -356,6 +359,8 @@ namespace PuzzleGame.Gameplay.Models
                         dropTile.BelowGridExplodeOffset = currentColumnDestroyedTiles
                             .First(v => v.Key.y < newY).Value;
                         dropTile.IsMoving = true;
+                        dropTile.DropHeightOffset = dropHeightOffset;
+                        dropHeightOffset++;
                         dropGridDictionary.Add(dropTile, new Vector2Int(x, y));
                         _gridData[x, newY] = null;
                         skipEmptySpace = true;
@@ -366,8 +371,8 @@ namespace PuzzleGame.Gameplay.Models
                     gridModel.BelowGridExplodeOffset = currentColumnDestroyedTiles.First().Value;
                     gridModel.SetPosition(new Vector2Int(x, y));
 
-                    gridModel.CreationHeightOffset = creationHeightOffset;
-                    creationHeightOffset++;
+                    gridModel.DropHeightOffset = dropHeightOffset;
+                    dropHeightOffset++;
                     _gridData[x, y] = gridModel;
                     gridModel.IsMoving = true;
                     dropGridDictionary.Add(gridModel, new Vector2Int(x, y));

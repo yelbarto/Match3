@@ -1117,10 +1117,6 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 6778891031854517288}
     - target: {fileID: 2801047593560312231, guid: 3eff2179f9c7b4386b2c81011b33acd9, type: 3}
-      propertyPath: m_RootOrder
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2801047593560312231, guid: 3eff2179f9c7b4386b2c81011b33acd9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -1165,9 +1161,21 @@ PrefabInstance:
       value: GameplayContext
       objectReference: {fileID: 0}
     - target: {fileID: 2801047594676493569, guid: 3eff2179f9c7b4386b2c81011b33acd9, type: 3}
+      propertyPath: cubeScaleDownDuration
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2801047594676493569, guid: 3eff2179f9c7b4386b2c81011b33acd9, type: 3}
+      propertyPath: dropAnimationFinalOffset
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2801047594676493569, guid: 3eff2179f9c7b4386b2c81011b33acd9, type: 3}
       propertyPath: topRightRocketPositioner
       value: 
       objectReference: {fileID: 316902171}
+    - target: {fileID: 2801047594676493569, guid: 3eff2179f9c7b4386b2c81011b33acd9, type: 3}
+      propertyPath: cubeScaleDownWaitDuration
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 2801047594676493569, guid: 3eff2179f9c7b4386b2c81011b33acd9, type: 3}
       propertyPath: bottomLeftRocketPositioner
       value: 

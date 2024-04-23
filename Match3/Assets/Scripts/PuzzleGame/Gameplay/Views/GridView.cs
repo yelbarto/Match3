@@ -36,7 +36,6 @@ namespace PuzzleGame.Gameplay.Views
         private GridType _gridType;
         private GridColor _gridColor;
         private GridViewStrategy _gridViewStrategy;
-        private int _currentDropOffset;
         private CancellationTokenSource _dropCts;
         private CancellationTokenSource _spawnCts;
         private CancellationTokenSource _lifetimeCts;
@@ -49,12 +48,11 @@ namespace PuzzleGame.Gameplay.Views
         }
 
         public void SetUp(GridType gridType, bool interactable, Vector2Int position,
-            GridViewStrategy gridViewStrategy, int dropOffset, GridColor gridColor)
+            GridViewStrategy gridViewStrategy, GridColor gridColor)
         {
             _gridViewStrategy = gridViewStrategy;
             SetCommonValues(gridType, position);
             SetInteractable(interactable);
-            _currentDropOffset = dropOffset;
             _gridColor = gridColor;
             if (gridType is GridType.Vase or GridType.Box or GridType.Stone)
                 _spawnCts = new CancellationTokenSource();
@@ -82,7 +80,7 @@ namespace PuzzleGame.Gameplay.Views
             if (itemImage.sprite != currentSprite)
                 itemImage.sprite = currentSprite;
         }
-
+        
         public async UniTask CrackGridAsync(GridViewStrategy strategy, bool isCompletelyCracked)
         {
             if (isCompletelyCracked)
@@ -93,19 +91,16 @@ namespace PuzzleGame.Gameplay.Views
                 await _gridViewStrategy.PlayBreakAnimation(_transform, _transform.position);
         }
 
-        public async UniTask DropGridSpeedBaseAsync(Vector2Int position, int belowGridExplodeOffset)
+        public async UniTask DropGridSpeedBaseAsync(Vector2Int position, int belowGridExplodeOffset,
+            int dropOffset)
         {
             _dropCts?.Cancel();
             _dropCts = new CancellationTokenSource();
             await UniTask.Delay(
-                TimeSpan.FromSeconds(GameplayVariables.Instance.ExplodeOffsetMultiplier * belowGridExplodeOffset), 
-                cancellationToken: _lifetimeCts.Token);
-            if (_currentDropOffset != 0)
-            {
-                await UniTask.Delay(TimeSpan.FromSeconds(dropOffsetMultiplier * _currentDropOffset),
-                    cancellationToken: _dropCts.Token);
-                _currentDropOffset = 0;
-            }
+                TimeSpan.FromSeconds(GameplayVariables.Instance.DropWaitForScaleDuration
+                                     + GameplayVariables.Instance.ExplodeOffsetMultiplier * belowGridExplodeOffset
+                                     + dropOffset * dropOffsetMultiplier), 
+                cancellationToken: _dropCts.Token);
 
             _transform.DOKill();
             var diffY = _transform.localPosition.y - position.y;
@@ -140,12 +135,20 @@ namespace PuzzleGame.Gameplay.Views
         public void OnSpawn()
         {
             _spawnCts?.Cancel();
+            transform.localScale = Vector3.one;
             _spawnCts = new CancellationTokenSource();
             gameObject.SetActive(true);
         }
 
         #region Debug
 
+        [Button]
+        public void CrackAnimationTest()
+        {
+            _transform.localScale = Vector3.one;
+            CrackGridAsync(null, true).Forget();
+        }
+        
         [Button]
         public void DropGridTest(Vector2Int initialPosition, Vector2Int endPosition, float speed)
         {

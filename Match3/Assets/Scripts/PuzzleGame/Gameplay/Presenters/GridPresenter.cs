@@ -3,6 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using PuzzleGame.Gameplay.Context;
 using PuzzleGame.Gameplay.DataStructures;
+using PuzzleGame.Gameplay.Helpers;
 using PuzzleGame.Gameplay.Models;
 using PuzzleGame.Gameplay.Views;
 using PuzzleGame.Gameplay.Views.Strategy;
@@ -53,12 +54,10 @@ namespace PuzzleGame.Gameplay.Presenters
         private void CreateGridView(bool shouldCreateAtModelLocation)
         {
             Vector2Int position;
-            var offset = 0;
             if (!shouldCreateAtModelLocation)
             {
-                position = new Vector2Int(_gridModel.Position.x, _boardBorders.y + _gridModel.CreationHeightOffset +
-                                                                 GameplayVariables.Instance.CreationHeightOffset);
-                offset = _gridModel.CreationHeightOffset;
+                position = new Vector2Int(_gridModel.Position.x, _boardBorders.y + _gridModel.DropHeightOffset +
+                                                                 GameplayVariables.Instance.DropHeightOffset);
             }
             else
             {
@@ -67,32 +66,32 @@ namespace PuzzleGame.Gameplay.Presenters
 
             if (_gridType is GridType.Cube)
             {
-                CreateCubeView(position, offset);
+                CreateCubeView(position);
             }
             else if (_gridModel.IsSpecialItem)
             {
-                CreateSpecialView(position, offset);
+                CreateSpecialView(position);
             }
             else
             {
-                CreateObstacleView(position, offset);
+                CreateObstacleView(position);
             }
         }
 
-        private void CreateCubeView(Vector2Int position, int offset)
+        private void CreateCubeView(Vector2Int position)
         {
             var cubeView = _gridViewPool.Get();
             var cubeModel = (CubeModel)_gridModel;
 
             _gridView = cubeView;
             cubeModel.OnStateChanged += OnStateChanged;
-            var cubeViewStrategy = new CubeViewStrategy(cubeModel.Color);
-            _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, cubeViewStrategy, offset,
+            var cubeViewStrategy = new CubeViewStrategy(_gridView.transform, cubeModel.Color);
+            _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, cubeViewStrategy,
                 cubeModel.Color);
             _gridView.SetSprite(_gridModel.Health, cubeModel.State);
         }
 
-        private void CreateObstacleView(Vector2Int position, int offset)
+        private void CreateObstacleView(Vector2Int position)
         {
             _gridView = Object.Instantiate(_viewPrefabContainer.GetGridViewPrefab(_gridType),
                 _gridViewPool.PoolParent);
@@ -112,11 +111,11 @@ namespace PuzzleGame.Gameplay.Presenters
                     throw new ArgumentOutOfRangeException();
             }
 
-            _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, strategy, offset, GridColor.Default);
+            _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, strategy, GridColor.Default);
             _gridView.SetSprite(_gridModel.Health, GridState.Default);
         }
 
-        private void CreateSpecialView(Vector2Int position, int offset)
+        private void CreateSpecialView(Vector2Int position)
         {
             _gridView = _gridViewPool.Get();
             GridViewStrategy strategy;
@@ -136,7 +135,7 @@ namespace PuzzleGame.Gameplay.Presenters
             }
 
 
-            _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, strategy, offset, GridColor.Default);
+            _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, strategy, GridColor.Default);
             _gridView.SetSprite(_gridModel.Health, GridState.Default);
         }
 
@@ -147,7 +146,8 @@ namespace PuzzleGame.Gameplay.Presenters
 
         private async UniTask OnDropGridAsync()
         {
-            await _gridView.DropGridSpeedBaseAsync(_gridModel.Position, _gridModel.BelowGridExplodeOffset);
+            await _gridView.DropGridSpeedBaseAsync(_gridModel.Position, _gridModel.BelowGridExplodeOffset,
+                _gridModel.DropHeightOffset);
             _gridModel.Dropped();
         }
 

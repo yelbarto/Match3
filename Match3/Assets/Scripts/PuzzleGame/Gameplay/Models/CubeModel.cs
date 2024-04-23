@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using PuzzleGame.Gameplay.DataStructures;
+using PuzzleGame.Gameplay.Helpers;
 using PuzzleGame.Gameplay.Models.Strategy;
 
 namespace PuzzleGame.Gameplay.Models
@@ -9,6 +12,7 @@ namespace PuzzleGame.Gameplay.Models
     public class CubeModel : GridModel
     {
         private List<CubeModel> _adjacentCubes;
+        private CancellationTokenSource _updateStateToken;
         public GridColor Color { get; }
         public GridState State { get; private set; }
         public event Action OnStateChanged;
@@ -28,6 +32,15 @@ namespace PuzzleGame.Gameplay.Models
         {
             base.Dropped();
             if (_adjacentCubes == null) return;
+            UpdateAdjacentCubesAsync().Forget();
+        }
+
+        private async UniTask UpdateAdjacentCubesAsync()
+        {
+            _updateStateToken?.Cancel();
+            _updateStateToken = new CancellationTokenSource();
+            await UniTask.Delay(TimeSpan.FromSeconds(GameplayVariables.Instance.CubeStateChangeWaitDuration),
+                cancellationToken: _updateStateToken.Token);
             foreach (var cube in _adjacentCubes)
             {
                 cube.OnAdjacentCubesUpdated(true);
