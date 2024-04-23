@@ -21,11 +21,18 @@ namespace PuzzleGame.Gameplay.Helpers
         [SerializeField] private float dropWaitForScaleDuration = 0.15f;
         [SerializeField] private Ease cubeScaleDownEase = Ease.OutCubic;
         
+        [SerializeField] private float gridCreationScaleUpValue = 1.1f;
+        [SerializeField] private float gridCreationScaleUpDuration = 0.2f;
+        [SerializeField] private Ease gridCreationScaleUpEase = Ease.InSine;
+        
         public int DropHeightOffset => dropHeightOffset;
         public float DropAnimationFinalOffset => dropAnimationFinalOffset;
         public int RocketInitialExplodeDistance => rocketInitialExplodeDistance;
         public float ExplodeOffsetMultiplier => explodeOffsetMultiplier;
         public float CubeStateChangeWaitDuration => cubeStateChangeWaitDuration;
+        public float GridCreationScaleUpValue => gridCreationScaleUpValue;
+        public float GridCreationScaleUpDuration => gridCreationScaleUpDuration;
+        public Ease GridCreationScaleUpEase => gridCreationScaleUpEase;
         public Transform BottomLeftRocketPositioner => bottomLeftRocketPositioner;
         public Transform TopRightRocketPositioner => topRightRocketPositioner;
         public float CubeScaleDownDuration => cubeScaleDownDuration;

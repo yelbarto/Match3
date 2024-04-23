@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using PuzzleGame.Gameplay.Context;
 using PuzzleGame.Gameplay.DataStructures;
 using PuzzleGame.Gameplay.Helpers;
 using PuzzleGame.Util;
@@ -20,7 +19,13 @@ namespace PuzzleGame.Gameplay.Views.Strategy
 
         public abstract Sprite GetSprite(int health, GridState gridState);
 
-        public virtual async UniTask PlayBreakAnimation(Transform zeroPointPosition, Vector3 position)
+        public virtual UniTask PlayCreationAnimation(Transform _)
+        {
+            // Do nothing by default
+            return UniTask.CompletedTask;
+        }
+
+        public virtual async UniTask PlayBreakAnimation(Transform _, Vector3 position)
         {
             await PlayBreakAnimationWithSized(position, ParticleSize.Medium);
         }

@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using PuzzleGame.Gameplay.Context;
 using PuzzleGame.Gameplay.DataStructures;
 using PuzzleGame.Gameplay.Helpers;
 using PuzzleGame.Gameplay.Models;
@@ -35,12 +34,13 @@ namespace PuzzleGame.Gameplay.Presenters
             _lifetimeCts = new CancellationTokenSource();
         }
 
-        public void SetUp(GridModel gridModel, bool shouldCreateAtModelLocation, Vector2Int boardBorders)
+        public void SetUp(GridModel gridModel, bool shouldCreateAtModelLocation, Vector2Int boardBorders, 
+            bool playAnimation)
         {
             _gridType = gridModel.GridType;
             _boardBorders = boardBorders;
             _gridModel = gridModel;
-            CreateGridView(shouldCreateAtModelLocation);
+            CreateGridView(shouldCreateAtModelLocation, playAnimation);
             _gridView.OnGridClicked += OnGridClicked;
             _gridModel.OnMatchEffectedGrid += OnMatchEffected;
             _gridModel.OnDropGrid += OnDropGrid;
@@ -51,7 +51,7 @@ namespace PuzzleGame.Gameplay.Presenters
             OnGridMatched?.Invoke(_gridModel, true);
         }
 
-        private void CreateGridView(bool shouldCreateAtModelLocation)
+        private void CreateGridView(bool shouldCreateAtModelLocation, bool playAnimation)
         {
             Vector2Int position;
             if (!shouldCreateAtModelLocation)
@@ -66,19 +66,19 @@ namespace PuzzleGame.Gameplay.Presenters
 
             if (_gridType is GridType.Cube)
             {
-                CreateCubeView(position);
+                CreateCubeView(position, !playAnimation);
             }
             else if (_gridModel.IsSpecialItem)
             {
-                CreateSpecialView(position);
+                CreateSpecialView(position, !playAnimation);
             }
             else
             {
-                CreateObstacleView(position);
+                CreateObstacleView(position, !playAnimation);
             }
         }
 
-        private void CreateCubeView(Vector2Int position)
+        private void CreateCubeView(Vector2Int position, bool isInitial)
         {
             var cubeView = _gridViewPool.Get();
             var cubeModel = (CubeModel)_gridModel;
@@ -87,11 +87,11 @@ namespace PuzzleGame.Gameplay.Presenters
             cubeModel.OnStateChanged += OnStateChanged;
             var cubeViewStrategy = new CubeViewStrategy(_gridView.transform, cubeModel.Color);
             _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, cubeViewStrategy,
-                cubeModel.Color);
+                cubeModel.Color, isInitial);
             _gridView.SetSprite(_gridModel.Health, cubeModel.State);
         }
 
-        private void CreateObstacleView(Vector2Int position)
+        private void CreateObstacleView(Vector2Int position, bool isInitial)
         {
             _gridView = Object.Instantiate(_viewPrefabContainer.GetGridViewPrefab(_gridType),
                 _gridViewPool.PoolParent);
@@ -111,11 +111,11 @@ namespace PuzzleGame.Gameplay.Presenters
                     throw new ArgumentOutOfRangeException();
             }
 
-            _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, strategy, GridColor.Default);
+            _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, strategy, GridColor.Default, isInitial);
             _gridView.SetSprite(_gridModel.Health, GridState.Default);
         }
 
-        private void CreateSpecialView(Vector2Int position)
+        private void CreateSpecialView(Vector2Int position, bool isInitial)
         {
             _gridView = _gridViewPool.Get();
             GridViewStrategy strategy;
@@ -135,7 +135,7 @@ namespace PuzzleGame.Gameplay.Presenters
             }
 
 
-            _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, strategy, GridColor.Default);
+            _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, strategy, GridColor.Default, isInitial);
             _gridView.SetSprite(_gridModel.Health, GridState.Default);
         }
 

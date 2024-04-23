@@ -13,7 +13,7 @@ namespace PuzzleGame.Gameplay.Models
     public class LevelModel
     {
         public List<GridModel> GridDataList => _gridData.Cast<GridModel>().ToList();
-        public event Action<List<GridModel>, bool> OnNewGridsCreated; 
+        public event Action<List<GridModel>, bool, bool> OnNewGridsCreated; 
         public int MoveCount { get; private set; }
         public Vector2Int BoardSize => _boardSize;
 
@@ -314,7 +314,7 @@ namespace PuzzleGame.Gameplay.Models
                 }
                 var createdSpecialItem = CreateSpecialItem(gridModel);
                 if (createdSpecialItem != null)
-                    OnNewGridsCreated?.Invoke(new List<GridModel> {createdSpecialItem}, true);
+                    OnNewGridsCreated?.Invoke(new List<GridModel> {createdSpecialItem}, true, true);
             }
             
             if (_activeMatchingQueue.Count == 0)
@@ -380,7 +380,7 @@ namespace PuzzleGame.Gameplay.Models
                 }
             }
             CalculateGridsAfterMatch();
-            OnNewGridsCreated?.Invoke(newGrids, false);
+            OnNewGridsCreated?.Invoke(newGrids, false, true);
             foreach (var gridPair in dropGridDictionary)
             {
                 gridPair.Key.DropGrid(gridPair.Value);

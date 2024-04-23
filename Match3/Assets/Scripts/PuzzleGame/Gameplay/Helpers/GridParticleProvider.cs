@@ -11,11 +11,15 @@ namespace PuzzleGame.Gameplay.Helpers
     {
         [SerializeField] private List<BreakableParticleData> gridParticleDataList;
         [SerializeField] private Transform particleParent;
+        [SerializeField] private RandomizedParticleSystem specialItemCreationParticle;
+        [SerializeField] private int specialItemCreationParticleWarmUpAmount = 2;
 
         public static GridParticleProvider Instance { get; private set; }
 
         private readonly Dictionary<GridType, Dictionary<GridColor, GameObjectPool<RandomizedParticleSystem>>>
             _particlePoolDictionary = new();
+
+        private GameObjectPool<RandomizedParticleSystem> _specialItemCreationParticlePool;
 
         private void Awake()
         {
@@ -37,6 +41,19 @@ namespace PuzzleGame.Gameplay.Helpers
                         new Dictionary<GridColor, GameObjectPool<RandomizedParticleSystem>>());
                 _particlePoolDictionary[particleData.GridType].Add(particleData.GridColor, pool);
             }
+            _specialItemCreationParticlePool = new GameObjectPool<RandomizedParticleSystem>(specialItemCreationParticle,
+                particleParent);
+            _specialItemCreationParticlePool.LoadPrefab(specialItemCreationParticleWarmUpAmount);
+        }
+
+        public RandomizedParticleSystem GetCreationParticleSystem()
+        {
+            return _specialItemCreationParticlePool.Get(particleParent);
+        }
+        
+        public void ReturnCreationParticleSystem(RandomizedParticleSystem randomizedParticleSystem)
+        {
+            _specialItemCreationParticlePool.Return(randomizedParticleSystem);
         }
 
         public RandomizedParticleSystem GetRandomizedParticleSystem(GridType gridType, GridColor gridColor)

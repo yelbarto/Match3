@@ -88,21 +88,21 @@ namespace PuzzleGame.Gameplay.Presenters
 
         private void CreateInitialGrids()
         {
-            CreateGrids(_levelModel.GridDataList, true);
+            CreateGrids(_levelModel.GridDataList, true, false);
         }
 
-        private void CreateGrids(List<GridModel> gridModels, bool shouldCreateAtModelLocation)
+        private void CreateGrids(List<GridModel> gridModels, bool shouldCreateAtModelLocation, bool playAnimation)
         {
             foreach (var gridModel in gridModels)
             {
-                CreateGrid(gridModel, shouldCreateAtModelLocation);
+                CreateGrid(gridModel, shouldCreateAtModelLocation, playAnimation);
             }
         }
 
-        private void CreateGrid(GridModel gridModel, bool shouldCreateAtModelLocation)
+        private void CreateGrid(GridModel gridModel, bool shouldCreateAtModelLocation, bool playAnimation)
         {
             var gridPresenter = _gridPresenterFactory.Create();
-            gridPresenter.SetUp(gridModel, shouldCreateAtModelLocation, _levelModel.BoardSize);
+            gridPresenter.SetUp(gridModel, shouldCreateAtModelLocation, _levelModel.BoardSize, playAnimation);
             gridPresenter.OnGridMatched += MatchGrid;
             gridPresenter.OnGridDestroyed += OnGridDestroyed;
             gridPresenter.OnCrackAnimationStateChange += OnCrackAnimationStateChanged;

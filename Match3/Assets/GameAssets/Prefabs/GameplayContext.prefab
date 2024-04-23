@@ -119,15 +119,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2dec8c6127214eb1b7c047ae9fb9e3dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  creationHeightOffset: 5
+  dropHeightOffset: 5
   bottomLeftRocketPositioner: {fileID: 0}
   topRightRocketPositioner: {fileID: 0}
   rocketInitialExplodeDistance: 1
   explodeOffsetMultiplier: 0.05
-  dropAnimationFinalOffset: 0.15
+  dropAnimationFinalOffset: 0.2
+  cubeStateChangeWaitDuration: 0.05
   cubeScaleDownDuration: 0.2
-  cubeScaleDownWaitDuration: 0.15
+  cubeScaleDownWaitDuration: 0.1
+  dropWaitForScaleDuration: 0.15
   cubeScaleDownEase: 9
+  gridCreationScaleUpValue: 1.5
+  gridCreationScaleUpDuration: 0.2
+  gridCreationScaleUpEase: 5
 --- !u!114 &2279413529644546745
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,3 +187,5 @@ MonoBehaviour:
     particleSystem: {fileID: 3390521060791543313, guid: 4ebef2e96bee942a7bb68b00c9873866, type: 3}
     warmUpAmount: 5
   particleParent: {fileID: 0}
+  specialItemCreationParticle: {fileID: 8489565994105991989, guid: ae1c7a0c45d8b48d591c5dbd3fae8443, type: 3}
+  specialItemCreationParticleWarmUpAmount: 2

@@ -39,6 +39,7 @@ namespace PuzzleGame.Gameplay.Views
         private CancellationTokenSource _dropCts;
         private CancellationTokenSource _spawnCts;
         private CancellationTokenSource _lifetimeCts;
+        private float _targetZ;
 
         private void Awake()
         {
@@ -48,7 +49,7 @@ namespace PuzzleGame.Gameplay.Views
         }
 
         public void SetUp(GridType gridType, bool interactable, Vector2Int position,
-            GridViewStrategy gridViewStrategy, GridColor gridColor)
+            GridViewStrategy gridViewStrategy, GridColor gridColor, bool initialSpawn)
         {
             _gridViewStrategy = gridViewStrategy;
             SetCommonValues(gridType, position);
@@ -56,6 +57,25 @@ namespace PuzzleGame.Gameplay.Views
             _gridColor = gridColor;
             if (gridType is GridType.Vase or GridType.Box or GridType.Stone)
                 _spawnCts = new CancellationTokenSource();
+            if (!initialSpawn)
+                PlayCreationAnimationAsync().Forget();
+        }
+
+        private async UniTask PlayCreationAnimationAsync()
+        {
+            var localPosition = _transform.localPosition;
+            var initialZ = _targetZ;
+            _targetZ = -10f;
+            localPosition.z = -10f;
+            _transform.localPosition = localPosition;
+            await _gridViewStrategy.PlayCreationAnimation(_transform);
+            if (-10f == _targetZ)
+            {
+                _targetZ = initialZ;
+            }
+            localPosition = _transform.localPosition;
+            localPosition.z =_targetZ;
+            _transform.localPosition = localPosition;
         }
 
         private void SetCommonValues(GridType gridType, Vector2Int position)
@@ -102,12 +122,17 @@ namespace PuzzleGame.Gameplay.Views
                                      + dropOffset * dropOffsetMultiplier), 
                 cancellationToken: _dropCts.Token);
 
-            _transform.DOKill();
             var diffY = _transform.localPosition.y - position.y;
             var speed = diffY >= 6 ? diffY * 2 : diffY >= 4 ? diffY * 2.5f : diffY * 3;
             speed = Mathf.Clamp(speed, minSpeedValue, maxSpeedValue);
-            _transform.DOLocalMove(GetPosition(position), speed).SetEase(dropSpeedEase)
-                .SetSpeedBased().ToUniTask(TweenCancelBehaviour.CompleteAndCancelAwait, _dropCts.Token).Forget();
+            var targetPosition = GetPosition(position);
+            if (_targetZ < -9f)
+            {
+                targetPosition.z = -10f;
+                _targetZ = targetPosition.z;
+            }
+            _transform.DOLocalMove(GetPosition(position), diffY / speed).SetEase(dropSpeedEase)
+                .ToUniTask(TweenCancelBehaviour.CompleteAndCancelAwait, _dropCts.Token).Forget();
             await UniTask.Delay(TimeSpan.FromSeconds(diffY / speed - GameplayVariables.Instance.DropAnimationFinalOffset),
                 cancellationToken: _dropCts.Token);
         }
@@ -154,6 +179,12 @@ namespace PuzzleGame.Gameplay.Views
         {
             SetPosition(initialPosition);
             _transform.DOLocalMove(GetPosition(endPosition), speed).SetEase(dropEase).SetSpeedBased();
+        }
+
+        [Button]
+        public void PlayCreationAnimationTest()
+        {
+            _gridViewStrategy.PlayCreationAnimation(_transform).Forget();
         }
 
         #endregion

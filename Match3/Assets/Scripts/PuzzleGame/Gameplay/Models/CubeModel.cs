@@ -66,6 +66,7 @@ namespace PuzzleGame.Gameplay.Models
 
         public void SetState(List<CubeModel> adjacentCubes, bool shouldInvokeCallbacks)
         {
+            _updateStateToken?.Cancel();
             _adjacentCubes = adjacentCubes;
             OnAdjacentCubesUpdated(shouldInvokeCallbacks);
         }
