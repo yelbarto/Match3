@@ -5305,7 +5305,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 120
+  m_fontSize: 109.2
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -5469,7 +5469,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1796301513024532749, guid: 41ebf7fb3ae084f4b92e5d28cc877be8, type: 3}
       propertyPath: InitialModule.startSize.scalar
-      value: 0.06
+      value: 0.07
       objectReference: {fileID: 0}
     - target: {fileID: 1796301513024532749, guid: 41ebf7fb3ae084f4b92e5d28cc877be8, type: 3}
       propertyPath: ClampVelocityModule.drag.scalar
@@ -5481,7 +5481,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1796301513024532749, guid: 41ebf7fb3ae084f4b92e5d28cc877be8, type: 3}
       propertyPath: InitialModule.startSize.minScalar
-      value: 0.03
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 1796301513024532749, guid: 41ebf7fb3ae084f4b92e5d28cc877be8, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar

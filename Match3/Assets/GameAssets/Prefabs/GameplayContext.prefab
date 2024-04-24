@@ -123,7 +123,7 @@ MonoBehaviour:
   bottomLeftRocketPositioner: {fileID: 0}
   topRightRocketPositioner: {fileID: 0}
   rocketInitialExplodeDistance: 1
-  explodeOffsetMultiplier: 0.05
+  explodeOffsetMultiplier: 0.06
   dropAnimationFinalOffset: 0.2
   cubeStateChangeWaitDuration: 0.05
   cubeScaleDownDuration: 0.2
