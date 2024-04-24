@@ -16,18 +16,34 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 2458173aa90424ce0b389292f6a082cb, type: 2}
+    - target: {fileID: 2593460309118438362, guid: 33f644c9755ec4e78a6a553c60bb6406, type: 3}
+      propertyPath: EmissionModule.m_Bursts.Array.data[0].countCurve.scalar
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 3319302826839049681, guid: 33f644c9755ec4e78a6a553c60bb6406, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 2458173aa90424ce0b389292f6a082cb, type: 2}
+    - target: {fileID: 3382813345992598521, guid: 33f644c9755ec4e78a6a553c60bb6406, type: 3}
+      propertyPath: EmissionModule.m_Bursts.Array.data[0].countCurve.scalar
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 3696015986216179832, guid: 33f644c9755ec4e78a6a553c60bb6406, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 2458173aa90424ce0b389292f6a082cb, type: 2}
+    - target: {fileID: 4487129078140264202, guid: 33f644c9755ec4e78a6a553c60bb6406, type: 3}
+      propertyPath: EmissionModule.m_Bursts.Array.data[0].countCurve.scalar
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 4691085204974848927, guid: 33f644c9755ec4e78a6a553c60bb6406, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 2458173aa90424ce0b389292f6a082cb, type: 2}
+    - target: {fileID: 5015637986669757822, guid: 33f644c9755ec4e78a6a553c60bb6406, type: 3}
+      propertyPath: EmissionModule.m_Bursts.Array.data[0].countCurve.scalar
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 6112935409402463224, guid: 33f644c9755ec4e78a6a553c60bb6406, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -75,6 +91,10 @@ PrefabInstance:
     - target: {fileID: 6734737898887625287, guid: 33f644c9755ec4e78a6a553c60bb6406, type: 3}
       propertyPath: m_Name
       value: CubeBreakParticle
+      objectReference: {fileID: 0}
+    - target: {fileID: 6992341634858150412, guid: 33f644c9755ec4e78a6a553c60bb6406, type: 3}
+      propertyPath: EmissionModule.m_Bursts.Array.data[0].countCurve.scalar
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 6993840405967759915, guid: 33f644c9755ec4e78a6a553c60bb6406, type: 3}
       propertyPath: m_Materials.Array.data[0]
