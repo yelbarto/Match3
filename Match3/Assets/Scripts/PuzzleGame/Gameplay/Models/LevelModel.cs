@@ -13,7 +13,7 @@ namespace PuzzleGame.Gameplay.Models
     public class LevelModel
     {
         public List<GridModel> GridDataList => _gridData.Cast<GridModel>().ToList();
-        public event Action<List<GridModel>, bool, bool> OnNewGridsCreated; 
+        public event Action<List<GridModel>, bool, bool> OnNewGridsCreated;
         public int MoveCount { get; private set; }
         public Vector2Int BoardSize => _boardSize;
 
@@ -24,9 +24,9 @@ namespace PuzzleGame.Gameplay.Models
         private readonly ObstacleBreakableModelStrategy _obstacleBreakableModelStrategy;
         private readonly PlayableBreakableModelStrategy _playableBreakableModelStrategy;
 
-        private readonly Dictionary<Vector2Int, int> _destroyedGrids = new ();
+        private readonly Dictionary<Vector2Int, int> _destroyedGrids = new();
         private readonly Queue<int> _activeMatchingQueue = new();
-        
+
         private bool _matchingActive;
         private int _matchCount;
         private GridModel[,] _gridData;
@@ -241,7 +241,7 @@ namespace PuzzleGame.Gameplay.Models
         {
             MoveCount -= spentMoveCount;
         }
-        
+
         public bool IsLevelFailed()
         {
             return MoveCount == 0;
@@ -312,16 +312,18 @@ namespace PuzzleGame.Gameplay.Models
                         brokenObstacles[obstacleModel.GridType]++;
                     }
                 }
+
                 var createdSpecialItem = CreateSpecialItem(gridModel);
                 if (createdSpecialItem != null)
-                    OnNewGridsCreated?.Invoke(new List<GridModel> {createdSpecialItem}, true, true);
+                    OnNewGridsCreated?.Invoke(new List<GridModel> { createdSpecialItem }, true, true);
             }
-            
+
             if (_activeMatchingQueue.Count == 0)
             {
                 DropAndCreateGrids();
                 _destroyedGrids.Clear();
             }
+
             _matchingActive = false;
             return brokenObstacles;
         }
@@ -344,8 +346,9 @@ namespace PuzzleGame.Gameplay.Models
                         dropHeightOffset = 0;
                         continue;
                     }
+
                     var skipEmptySpace = false;
-                    for (var newY = y+1; newY < _boardSize.y; newY++)
+                    for (var newY = y + 1; newY < _boardSize.y; newY++)
                     {
                         if (_gridData[x, newY] == null) continue;
                         var dropTile = _gridData[x, newY];
@@ -355,6 +358,7 @@ namespace PuzzleGame.Gameplay.Models
                             y = newY;
                             break;
                         }
+
                         _gridData[x, y] = dropTile;
                         dropTile.BelowGridExplodeOffset = currentColumnDestroyedTiles
                             .First(v => v.Key.y < newY).Value;
@@ -366,9 +370,16 @@ namespace PuzzleGame.Gameplay.Models
                         skipEmptySpace = true;
                         break;
                     }
+
                     if (skipEmptySpace) continue;
                     var gridModel = CreateGridModel("rand");
-                    gridModel.BelowGridExplodeOffset = currentColumnDestroyedTiles.First().Value;
+                    var maxOffset = currentColumnDestroyedTiles.Values.Max();
+                    var topOffset = currentColumnDestroyedTiles.First().Value;
+                    var belowGridExplodeOffset = maxOffset - topOffset > currentColumnDestroyedTiles.Count
+                        ? maxOffset
+                        : topOffset;
+                    gridModel.BelowGridExplodeOffset = belowGridExplodeOffset;
+
                     gridModel.SetPosition(new Vector2Int(x, y));
 
                     gridModel.DropHeightOffset = dropHeightOffset;
@@ -379,6 +390,7 @@ namespace PuzzleGame.Gameplay.Models
                     newGrids.Add(gridModel);
                 }
             }
+
             CalculateGridsAfterMatch();
             OnNewGridsCreated?.Invoke(newGrids, false, true);
             foreach (var gridPair in dropGridDictionary)
@@ -541,7 +553,7 @@ namespace PuzzleGame.Gameplay.Models
                     return new SpecialItemModel(_horizontalRocketModelStrategy, GridType.HorizontalRocket,
                         _currentGridCount, _playableBreakableModelStrategy);
                 case "bo":
-                    return new ObstacleModel(GridType.Box, _currentGridCount, 
+                    return new ObstacleModel(GridType.Box, _currentGridCount,
                         _obstacleBreakableModelStrategy, 1);
                 case "s":
                     return new ObstacleModel(GridType.Stone, _currentGridCount,
