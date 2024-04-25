@@ -28,7 +28,7 @@ namespace PuzzleGame.Player
 
         public bool ChangeLevel(int level)
         {
-            if (CurrentLevel >= _maxLevelCount || level < 1)
+            if (level > _maxLevelCount || level < 1)
                 return false;
             CurrentLevel = level;
             PlayerPrefs.SetInt(LEVEL_PLAYER_PREFS_KEY, CurrentLevel);
