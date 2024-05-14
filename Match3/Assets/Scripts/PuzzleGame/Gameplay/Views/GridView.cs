@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using PuzzleGame.Gameplay.Context;
 using PuzzleGame.Gameplay.DataStructures;
 using PuzzleGame.Gameplay.Helpers;
 using PuzzleGame.Gameplay.Views.Strategy;
@@ -10,14 +9,12 @@ using PuzzleGame.Util;
 using PuzzleGame.Util.Pool;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace PuzzleGame.Gameplay.Views
 {
     public class GridView : MonoBehaviour, IPoolable
     {
         private const string DROP = "Drop Parameters";
-        private const string EXPLODE = "Explode Parameters";
         private const string REF = "References";
 
         [SerializeField, FoldoutGroup(REF)] private SpriteRenderer itemImage;
@@ -33,11 +30,8 @@ namespace PuzzleGame.Gameplay.Views
         public event Action OnGridClicked;
 
         private Transform _transform;
-        private GridType _gridType;
-        private GridColor _gridColor;
         private GridViewStrategy _gridViewStrategy;
         private CancellationTokenSource _dropCts;
-        private CancellationTokenSource _spawnCts;
         private CancellationTokenSource _lifetimeCts;
         private float _targetZ;
 
@@ -48,15 +42,12 @@ namespace PuzzleGame.Gameplay.Views
             _lifetimeCts = new CancellationTokenSource();
         }
 
-        public void SetUp(GridType gridType, bool interactable, Vector2Int position,
-            GridViewStrategy gridViewStrategy, GridColor gridColor, bool initialSpawn)
+        public void SetUp(bool interactable, Vector2Int position,
+            GridViewStrategy gridViewStrategy, bool initialSpawn)
         {
             _gridViewStrategy = gridViewStrategy;
-            SetCommonValues(gridType, position);
+            SetCommonValues(position);
             SetInteractable(interactable);
-            _gridColor = gridColor;
-            if (gridType is GridType.Vase or GridType.Box or GridType.Stone)
-                _spawnCts = new CancellationTokenSource();
             if (!initialSpawn)
                 PlayCreationAnimationAsync().Forget();
         }
@@ -69,7 +60,7 @@ namespace PuzzleGame.Gameplay.Views
             localPosition.z = -10f;
             _transform.localPosition = localPosition;
             await _gridViewStrategy.PlayCreationAnimation(_transform);
-            if (-10f == _targetZ)
+            if (Math.Abs(-10f - _targetZ) < 0.001f)
             {
                 _targetZ = initialZ;
             }
@@ -78,9 +69,8 @@ namespace PuzzleGame.Gameplay.Views
             _transform.localPosition = localPosition;
         }
 
-        private void SetCommonValues(GridType gridType, Vector2Int position)
+        private void SetCommonValues(Vector2Int position)
         {
-            _gridType = gridType;
             SetPosition(position);
         }
 
@@ -144,7 +134,6 @@ namespace PuzzleGame.Gameplay.Views
 
         private void OnDestroy()
         {
-            _spawnCts?.Cancel();
             _lifetimeCts?.Cancel();
         }
 
@@ -153,15 +142,12 @@ namespace PuzzleGame.Gameplay.Views
             itemImage.sprite = null;
             inputComponent.SetInteractable(false);
             gameObject.SetActive(false);
-            _spawnCts?.Cancel();
             _dropCts?.Cancel();
         }
 
         public void OnSpawn()
         {
-            _spawnCts?.Cancel();
             transform.localScale = Vector3.one;
-            _spawnCts = new CancellationTokenSource();
             gameObject.SetActive(true);
         }
 

@@ -11,7 +11,7 @@ namespace PuzzleGame.Gameplay.Models
 {
     public class CubeModel : GridModel
     {
-        private List<CubeModel> _adjacentCubes;
+        private HashSet<CubeModel> _adjacentCubes;
         private CancellationTokenSource _updateStateToken;
         public GridColor Color { get; }
         public GridState State { get; private set; }
@@ -64,7 +64,7 @@ namespace PuzzleGame.Gameplay.Models
             State = GridState.Default;
         }
 
-        public void SetState(List<CubeModel> adjacentCubes, bool shouldInvokeCallbacks)
+        public void SetState(HashSet<CubeModel> adjacentCubes, bool shouldInvokeCallbacks)
         {
             _updateStateToken?.Cancel();
             _adjacentCubes = adjacentCubes;

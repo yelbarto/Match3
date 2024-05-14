@@ -86,8 +86,7 @@ namespace PuzzleGame.Gameplay.Presenters
             _gridView = cubeView;
             cubeModel.OnStateChanged += OnStateChanged;
             var cubeViewStrategy = new CubeViewStrategy(_gridView.transform, cubeModel.Color);
-            _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, cubeViewStrategy,
-                cubeModel.Color, isInitial);
+            _gridView.SetUp(_gridModel.IsInteractable, position, cubeViewStrategy, isInitial);
             _gridView.SetSprite(_gridModel.Health, cubeModel.State);
         }
 
@@ -111,7 +110,7 @@ namespace PuzzleGame.Gameplay.Presenters
                     throw new ArgumentOutOfRangeException();
             }
 
-            _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, strategy, GridColor.Default, isInitial);
+            _gridView.SetUp(_gridModel.IsInteractable, position, strategy, isInitial);
             _gridView.SetSprite(_gridModel.Health, GridState.Default);
         }
 
@@ -135,7 +134,7 @@ namespace PuzzleGame.Gameplay.Presenters
             }
 
 
-            _gridView.SetUp(_gridType, _gridModel.IsInteractable, position, strategy, GridColor.Default, isInitial);
+            _gridView.SetUp(_gridModel.IsInteractable, position, strategy, isInitial);
             _gridView.SetSprite(_gridModel.Health, GridState.Default);
         }
 

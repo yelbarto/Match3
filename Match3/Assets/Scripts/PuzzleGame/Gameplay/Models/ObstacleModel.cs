@@ -13,7 +13,7 @@ namespace PuzzleGame.Gameplay.Models
 
         public override bool CanFall()
         {
-            return GridType is GridType.Vase;
+            return false;
         }
     }
 }

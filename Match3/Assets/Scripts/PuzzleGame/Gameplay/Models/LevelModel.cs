@@ -126,115 +126,90 @@ namespace PuzzleGame.Gameplay.Models
             SpecialItemModel gridModel = null;
             if (x + 1 < _boardSize.x)
             {
-                if (_gridData[x + 1, y] is SpecialItemModel nextGrid)
-                {
-                    gridModel = nextGrid;
-                    if (nextGrid.GridType is GridType.Tnt)
-                        return nextGrid;
-                }
+                if (GetAdjacentSpecialGrid(x + 1, y, ref gridModel)) 
+                    return gridModel;
             }
 
             if (y + 1 < _boardSize.y)
             {
-                if (_gridData[x, y + 1] is SpecialItemModel nextGrid)
-                {
-                    gridModel = nextGrid;
-                    if (nextGrid.GridType is GridType.Tnt)
-                        return nextGrid;
-                }
+                if (GetAdjacentSpecialGrid(x, y + 1, ref gridModel)) 
+                    return gridModel;
             }
 
             if (x > 0)
             {
-                if (_gridData[x - 1, y] is SpecialItemModel nextGrid)
-                {
-                    gridModel = nextGrid;
-                    if (nextGrid.GridType is GridType.Tnt)
-                        return nextGrid;
-                }
+                if (GetAdjacentSpecialGrid(x - 1, y, ref gridModel)) 
+                    return gridModel;
             }
 
             if (y > 0)
             {
-                if (_gridData[x, y - 1] is SpecialItemModel nextGrid)
-                {
-                    gridModel = nextGrid;
-                    if (nextGrid.GridType is GridType.Tnt)
-                        return nextGrid;
-                }
+                if (GetAdjacentSpecialGrid(x, y - 1, ref gridModel)) 
+                    return gridModel;
             }
 
             return gridModel;
         }
 
-        private (List<CubeModel> adjacentCubes, List<ObstacleModel> adjacentObstacles) GetAdjacentGrids(int x, int y,
-            GridColor color, List<CubeModel> cubeModels, List<ObstacleModel> adjacentObstacles)
+        private bool GetAdjacentSpecialGrid(int x, int y, ref SpecialItemModel gridModel)
+        {
+            if (_gridData[x, y] is SpecialItemModel nextGrid)
+            {
+                gridModel = nextGrid;
+                if (nextGrid.GridType is GridType.Tnt)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private (HashSet<CubeModel> adjacentCubes, HashSet<ObstacleModel> adjacentObstacles) GetAdjacentGrids(int x, int y,
+            GridColor color, HashSet<CubeModel> cubeModels, HashSet<ObstacleModel> adjacentObstacles)
         {
             if (x > 0)
             {
-                var nextGrid = _gridData[x - 1, y];
-                if (nextGrid is CubeModel cubeModel && cubeModel.IsSameColor(color)
-                                                    && cubeModels.All(c => c.Id != cubeModel.Id))
-                {
-                    cubeModels.Add(cubeModel);
-                    (cubeModels, adjacentObstacles) = GetAdjacentGrids(x - 1, y, color, cubeModels, adjacentObstacles);
-                }
-                else if (nextGrid is ObstacleModel obstacleModel
-                         && adjacentObstacles.All(o => o.Id != nextGrid.Id))
-                {
-                    adjacentObstacles.Add(obstacleModel);
-                }
+                cubeModels = GetAdjacentSameColoredCubesAndObstacles(x - 1, y, color, cubeModels, ref adjacentObstacles);
             }
 
             if (y > 0)
             {
-                var nextGrid = _gridData[x, y - 1];
-                if (nextGrid is CubeModel cubeModel && cubeModel.IsSameColor(color)
-                                                    && cubeModels.All(c => c.Id != cubeModel.Id))
-                {
-                    cubeModels.Add(cubeModel);
-                    (cubeModels, adjacentObstacles) = GetAdjacentGrids(x, y - 1, color, cubeModels, adjacentObstacles);
-                }
-                else if (nextGrid is ObstacleModel obstacleModel
-                         && adjacentObstacles.All(o => o.Id != nextGrid.Id))
-                {
-                    adjacentObstacles.Add(obstacleModel);
-                }
+                cubeModels = GetAdjacentSameColoredCubesAndObstacles(x, y - 1, color, cubeModels, ref adjacentObstacles);
             }
 
             if (x < _boardSize.x - 1)
             {
-                var nextGrid = _gridData[x + 1, y];
-                if (nextGrid is CubeModel cubeModel && cubeModel.IsSameColor(color)
-                                                    && cubeModels.All(c => c.Id != cubeModel.Id))
-                {
-                    cubeModels.Add(cubeModel);
-                    (cubeModels, adjacentObstacles) = GetAdjacentGrids(x + 1, y, color, cubeModels, adjacentObstacles);
-                }
-                else if (nextGrid is ObstacleModel obstacleModel
-                         && adjacentObstacles.All(o => o.Id != nextGrid.Id))
-                {
-                    adjacentObstacles.Add(obstacleModel);
-                }
+                cubeModels = GetAdjacentSameColoredCubesAndObstacles(x + 1, y, color, cubeModels, ref adjacentObstacles);
             }
 
             if (y < _boardSize.y - 1)
             {
-                var nextGrid = _gridData[x, y + 1];
-                if (nextGrid is CubeModel cubeModel && cubeModel.IsSameColor(color)
-                                                    && cubeModels.All(c => c.Id != cubeModel.Id))
-                {
-                    cubeModels.Add(cubeModel);
-                    (cubeModels, adjacentObstacles) = GetAdjacentGrids(x, y + 1, color, cubeModels, adjacentObstacles);
-                }
-                else if (nextGrid is ObstacleModel obstacleModel
-                         && adjacentObstacles.All(o => o.Id != nextGrid.Id))
-                {
-                    adjacentObstacles.Add(obstacleModel);
-                }
+                cubeModels = GetAdjacentSameColoredCubesAndObstacles(x, y + 1, color, cubeModels, ref adjacentObstacles);
             }
 
             return (cubeModels, adjacentObstacles);
+        }
+
+        private HashSet<CubeModel> GetAdjacentSameColoredCubesAndObstacles(int x, int y, GridColor color, HashSet<CubeModel> cubeModels,
+            ref HashSet<ObstacleModel> adjacentObstacles)
+        {
+            var nextGrid = _gridData[x, y];
+            if (nextGrid is CubeModel cubeModel && cubeModel.IsSameColor(color))
+            {
+                var isNewCube = cubeModels.Add(cubeModel);
+                if (isNewCube)
+                {
+                    (cubeModels, adjacentObstacles) = GetAdjacentGrids(x, y, color, cubeModels, adjacentObstacles);
+                    return cubeModels;
+                }
+            }
+            if (nextGrid is ObstacleModel obstacleModel)
+            {
+                adjacentObstacles.Add(obstacleModel);
+            }
+
+            return cubeModels;
         }
 
         public void SpendMove(int spentMoveCount)
@@ -289,8 +264,8 @@ namespace PuzzleGame.Gameplay.Models
             else
             {
                 var cubeModel = (CubeModel)gridModel;
-                var cubeList = new List<CubeModel> { cubeModel };
-                var obstacleList = new List<ObstacleModel>();
+                var cubeList = new HashSet<CubeModel> { cubeModel };
+                var obstacleList = new HashSet<ObstacleModel>();
                 (cubeList, obstacleList) = GetAdjacentGrids(cubeModel.Position.x, cubeModel.Position.y, cubeModel.Color,
                     cubeList,
                     obstacleList);
@@ -351,43 +326,15 @@ namespace PuzzleGame.Gameplay.Models
                     for (var newY = y + 1; newY < _boardSize.y; newY++)
                     {
                         if (_gridData[x, newY] == null) continue;
-                        var dropTile = _gridData[x, newY];
-                        if (!dropTile.CanFall())
-                        {
-                            skipEmptySpace = true;
-                            y = newY;
-                            break;
-                        }
-
-                        _gridData[x, y] = dropTile;
-                        dropTile.BelowGridExplodeOffset = currentColumnDestroyedTiles
-                            .First(v => v.Key.y < newY).Value;
-                        dropTile.IsMoving = true;
-                        dropTile.DropHeightOffset = dropHeightOffset;
-                        dropHeightOffset++;
-                        dropGridDictionary.Add(dropTile, new Vector2Int(x, y));
-                        _gridData[x, newY] = null;
+                        DropGrid(x, newY, currentColumnDestroyedTiles, dropGridDictionary,
+                            ref y, ref dropHeightOffset);
                         skipEmptySpace = true;
                         break;
                     }
 
                     if (skipEmptySpace) continue;
-                    var gridModel = CreateGridModel("rand");
-                    var maxOffset = currentColumnDestroyedTiles.Values.Max();
-                    var topOffset = currentColumnDestroyedTiles.First().Value;
-                    var belowGridExplodeOffset = maxOffset - topOffset > currentColumnDestroyedTiles.Count
-                        ? maxOffset
-                        : topOffset;
-                    gridModel.BelowGridExplodeOffset = belowGridExplodeOffset;
-
-                    gridModel.SetPosition(new Vector2Int(x, y));
-
-                    gridModel.DropHeightOffset = dropHeightOffset;
-                    dropHeightOffset++;
-                    _gridData[x, y] = gridModel;
-                    gridModel.IsMoving = true;
-                    dropGridDictionary.Add(gridModel, new Vector2Int(x, y));
-                    newGrids.Add(gridModel);
+                    dropHeightOffset = CreateRandomGridModel(currentColumnDestroyedTiles, x, y, dropHeightOffset, 
+                        dropGridDictionary, newGrids);
                 }
             }
 
@@ -397,6 +344,49 @@ namespace PuzzleGame.Gameplay.Models
             {
                 gridPair.Key.DropGrid(gridPair.Value);
             }
+        }
+
+        private void DropGrid(int x, int newY, Dictionary<Vector2Int, int> currentColumnDestroyedTiles,
+            Dictionary<GridModel, Vector2Int> dropGridDictionary, ref int y,
+            ref int dropHeightOffset)
+        {
+            var dropTile = _gridData[x, newY];
+            if (!dropTile.CanFall())
+            {
+                y = newY;
+                return;
+            }
+
+            _gridData[x, y] = dropTile;
+            dropTile.BelowGridExplodeOffset = currentColumnDestroyedTiles
+                .First(v => v.Key.y < newY).Value;
+            dropTile.IsMoving = true;
+            dropTile.DropHeightOffset = dropHeightOffset;
+            dropHeightOffset++;
+            dropGridDictionary.Add(dropTile, new Vector2Int(x, y));
+            _gridData[x, newY] = null;
+        }
+
+        private int CreateRandomGridModel(Dictionary<Vector2Int, int> currentColumnDestroyedTiles, int x, int y,
+            int dropHeightOffset, Dictionary<GridModel, Vector2Int> dropGridDictionary, List<GridModel> newGrids)
+        {
+            var gridModel = CreateGridModel("rand");
+            var maxOffset = currentColumnDestroyedTiles.Values.Max();
+            var topOffset = currentColumnDestroyedTiles.First().Value;
+            var belowGridExplodeOffset = maxOffset - topOffset > currentColumnDestroyedTiles.Count
+                ? maxOffset
+                : topOffset;
+            gridModel.BelowGridExplodeOffset = belowGridExplodeOffset;
+
+            gridModel.SetPosition(new Vector2Int(x, y));
+
+            gridModel.DropHeightOffset = dropHeightOffset;
+            dropHeightOffset++;
+            _gridData[x, y] = gridModel;
+            gridModel.IsMoving = true;
+            dropGridDictionary.Add(gridModel, new Vector2Int(x, y));
+            newGrids.Add(gridModel);
+            return dropHeightOffset;
         }
 
         private GridModel CreateSpecialItem(GridModel gridModel)
@@ -449,13 +439,11 @@ namespace PuzzleGame.Gameplay.Models
                 {
                     var gridModel = _gridData[x, y];
                     var cubeModel = gridModel as CubeModel;
-                    if (cubeModel == null) continue;
-                    if (cubeModel.State is not GridState.Default) continue;
-                    var gridList = new List<GridModel> { gridModel };
-                    gridList = CheckAndSetIfAdjacentGridIsTheSame(x, y, cubeModel.Color, gridList);
-                    if (gridList.Count > 1)
+                    if (cubeModel?.State is not GridState.Default) continue;
+                    var cubeList = new HashSet<CubeModel> { cubeModel };
+                    cubeList = GetSameColoredAdjacentCubes(x, y, cubeModel.Color, cubeList);
+                    if (cubeList.Count > 1)
                     {
-                        var cubeList = gridList.Cast<CubeModel>().ToList();
                         foreach (var selectedGrids in cubeList)
                         {
                             selectedGrids.SetState(cubeList, true);
@@ -469,60 +457,41 @@ namespace PuzzleGame.Gameplay.Models
             }
         }
 
-        private List<GridModel> CheckAndSetIfAdjacentGridIsTheSame(int x, int y, GridColor color,
-            List<GridModel> interactableGrids)
+        private HashSet<CubeModel> GetSameColoredAdjacentCubes(int x, int y, GridColor color,
+            HashSet<CubeModel> interactableGrids)
         {
             if (x + 1 < _boardSize.x)
             {
-                if (_gridData[x + 1, y] is CubeModel nextGrid)
-                {
-                    if (nextGrid.IsSameColor(color) && interactableGrids.All(g => g.Id != nextGrid.Id))
-                    {
-                        interactableGrids.Add(nextGrid);
-                        interactableGrids = CheckAndSetIfAdjacentGridIsTheSame(x + 1, y, color,
-                            interactableGrids);
-                    }
-                }
+                interactableGrids = CheckSameColoredAdjacentCubes(x + 1, y, color, interactableGrids);
             }
 
             if (x > 0)
             {
-                if (_gridData[x - 1, y] is CubeModel nextGrid)
-                {
-                    if (nextGrid.IsSameColor(color) && interactableGrids.All(g => g.Id != nextGrid.Id))
-                    {
-                        interactableGrids.Add(nextGrid);
-                        interactableGrids = CheckAndSetIfAdjacentGridIsTheSame(x - 1, y, color,
-                            interactableGrids);
-                    }
-                }
+                interactableGrids = CheckSameColoredAdjacentCubes(x - 1, y, color, interactableGrids);
             }
 
             if (y + 1 < _boardSize.y)
             {
-                if (_gridData[x, y + 1] is CubeModel nextGrid)
-                {
-                    if (nextGrid.IsSameColor(color) && interactableGrids.All(g => g.Id != nextGrid.Id))
-                    {
-                        interactableGrids.Add(nextGrid);
-                        interactableGrids = CheckAndSetIfAdjacentGridIsTheSame(x, y + 1, color,
-                            interactableGrids);
-                    }
-                }
+                interactableGrids = CheckSameColoredAdjacentCubes(x, y + 1, color, interactableGrids);
+
             }
 
             if (y > 0)
             {
-                if (_gridData[x, y - 1] is CubeModel nextGrid)
-                {
-                    if (nextGrid.IsSameColor(color) && interactableGrids.All(g => g.Id != nextGrid.Id))
-                    {
-                        interactableGrids.Add(nextGrid);
-                        interactableGrids = CheckAndSetIfAdjacentGridIsTheSame(x, y - 1, color,
-                            interactableGrids);
-                    }
-                }
+                interactableGrids = CheckSameColoredAdjacentCubes(x, y - 1, color, interactableGrids);
             }
+
+            return interactableGrids;
+        }
+
+        private HashSet<CubeModel> CheckSameColoredAdjacentCubes(int x, int y, GridColor color, HashSet<CubeModel> interactableGrids)
+        {
+            if (_gridData[x, y] is not CubeModel nextGrid) return interactableGrids;
+            if (!nextGrid.IsSameColor(color)) return interactableGrids;
+            var isNewGrid = interactableGrids.Add(nextGrid);
+            if (isNewGrid)
+                interactableGrids = GetSameColoredAdjacentCubes(x, y, color,
+                    interactableGrids);
 
             return interactableGrids;
         }
@@ -559,7 +528,7 @@ namespace PuzzleGame.Gameplay.Models
                     return new ObstacleModel(GridType.Stone, _currentGridCount,
                         _onlyBySpecialItemBreakableModelStrategy, 1);
                 case "v":
-                    return new ObstacleModel(GridType.Vase, _currentGridCount,
+                    return new VaseModel(GridType.Vase, _currentGridCount,
                         _obstacleBreakableModelStrategy, 2);
                 default:
                     throw new Exception("Invalid grid type! " + gridType);
